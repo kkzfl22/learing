@@ -1,0 +1,132 @@
+重构第一节：
+重构第一步，编写单元测试，确保数据能够达到预期的值，重构改变内部行为，外部不变
+
+搬移方法
+由于计算方法使用了来自rental类的信息，但没有使用customer信息
+此种场景就需要进行搬移，
+进行测试
+
+重构前:
+/**
+   * 生成详单的函数
+   *
+   * @return
+   */
+  public String statement() {
+    double totalAmount = 0;
+    int frequentRenterPoints = 0;
+    String result = "Rental Record for " + getName() + "\n";
+    for (Rental each : rentals) {
+      // 调用方法进行积分的计算
+      double thisAmount = countAmount(each);
+
+      frequentRenterPoints++;
+      // 如果当前为新片，并且时间超过1天，则租户的点加1,用于表示租借了几部影片
+      if (each.getMovie().getPriceCode() == Movie.NEW_RELEASE && each.getDaysRented() > 1) {
+        frequentRenterPoints++;
+      }
+      result += "\t" + each.getMovie().getTitle() + "\t" + thisAmount + "\n";
+      totalAmount += thisAmount;
+    }
+
+    result += " Amount owed is " + totalAmount + "\n";
+    result += " You earned " + frequentRenterPoints + " frequent renter points";
+    return result;
+  }
+
+  /**
+   * 将计算逻辑分离
+   *
+   * @param each 租用对象
+   * @return 积分计算
+   */
+  private double countAmount(Rental each) {
+    double thisAmount = 0;
+    switch (each.getMovie().getPriceCode()) {
+        // 如果当前影片为普通片，且时间超过2天，则1.5倍积分
+      case Movie.REGULAR:
+        thisAmount += 2;
+        if (each.getDaysRented() > 2) {
+          thisAmount += (each.getDaysRented() - 2) * 1.5;
+        }
+        break;
+        // 新片为3倍租分
+      case Movie.NEW_RELEASE:
+        thisAmount += each.getDaysRented() * 3;
+        break;
+        // 儿童片，时间超过3天，1.5倍积分
+      case Movie.CHILDRENS:
+        thisAmount += 1.5;
+        if (each.getDaysRented() > 3) {
+          thisAmount += (each.getDaysRented() - 3) * 1.5;
+        }
+        break;
+    }
+    return thisAmount;
+  }
+
+
+
+
+  重构后:
+  Customer
+ /**
+   * 生成详单的函数
+   *
+   * @return
+   */
+  public String statement() {
+    double totalAmount = 0;
+    int frequentRenterPoints = 0;
+    String result = "Rental Record for " + getName() + "\n";
+    for (Rental each : rentals) {
+      // 调用方法进行积分的计算
+      double thisAmount = each.countAmount();
+
+      frequentRenterPoints++;
+      // 如果当前为新片，并且时间超过1天，则租户的点加1,用于表示租借了几部影片
+      if (each.getMovie().getPriceCode() == Movie.NEW_RELEASE && each.getDaysRented() > 1) {
+        frequentRenterPoints++;
+      }
+      result += "\t" + each.getMovie().getTitle() + "\t" + thisAmount + "\n";
+      totalAmount += thisAmount;
+    }
+
+    result += " Amount owed is " + totalAmount + "\n";
+    result += " You earned " + frequentRenterPoints + " frequent renter points";
+    return result;
+  }
+
+
+
+  Rental
+   /**
+     * 将计算逻辑分离
+     *
+     * @return 积分计算
+     */
+    public double countAmount() {
+      double thisAmount = 0;
+      switch (this.getMovie().getPriceCode()) {
+          // 如果当前影片为普通片，且时间超过2天，则1.5倍积分
+        case Movie.REGULAR:
+          thisAmount += 2;
+          if (this.getDaysRented() > 2) {
+            thisAmount += (this.getDaysRented() - 2) * 1.5;
+          }
+          break;
+          // 新片为3倍租分
+        case Movie.NEW_RELEASE:
+          thisAmount += this.getDaysRented() * 3;
+          break;
+          // 儿童片，时间超过3天，1.5倍积分
+        case Movie.CHILDRENS:
+          thisAmount += 1.5;
+          if (this.getDaysRented() > 3) {
+            thisAmount += (this.getDaysRented() - 3) * 1.5;
+          }
+          break;
+      }
+      return thisAmount;
+    }
+

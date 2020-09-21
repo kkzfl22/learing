@@ -1,0 +1,36 @@
+Inline Temp(内联临时变量)
+
+有一个临时变量，只被一个简单的表达式赋值一次，而它妨碍了其他重构手法。
+则将所对对该变量的引用动作，替换为对它赋值的那个表达式自身.
+
+做法，如果变量未被声明为final，则将其声明为final，此操作可确保只被赋值一次。
+
+重构前
+public boolean runData() {
+    double basePrice = getValue();
+    return basePrice > 1000;
+  }
+
+  /**
+   * 演示函数，仅获取值使用
+   *
+   * @return
+   */
+  private double getValue() {
+    return 1;
+  }
+
+
+重构后:
+ public boolean runData() {
+    return getValue() > 1000;
+  }
+
+  /**
+   * 演示函数，仅获取值使用
+   *
+   * @return
+   */
+  private double getValue() {
+    return 1;
+  }

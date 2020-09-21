@@ -1,0 +1,76 @@
+重构第一节：
+重构第一步，编写单元测试，确保数据能够达到预期的值，重构改变内部行为，外部不变
+
+重构
+去除临时变量totalAmount
+
+
+
+重构前:
+Customer
+ /**
+   * 生成详单的函数
+   *
+   * @return
+   */
+  public String statement() {
+    double totalAmount = 0;
+    int frequentRenterPoints = 0;
+    String result = "Rental Record for " + getName() + "\n";
+    for (Rental each : rentals) {
+      // 调用方法进行积分的计算
+      double thisAmount = each.countAmount();
+
+      // 积分计算的方法
+      frequentRenterPoints = each.frequentRenterCount();
+
+      result += "\t" + each.getMovie().getTitle() + "\t" + thisAmount + "\n";
+      totalAmount += thisAmount;
+    }
+
+    result += " Amount owed is " + totalAmount + "\n";
+    result += " You earned " + frequentRenterPoints + " frequent renter points";
+    return result;
+  }
+
+
+
+  重构后:
+  /**
+     * 生成详单的函数
+     *
+     * @return
+     */
+    public String statement() {
+      int frequentRenterPoints = 0;
+      String result = "Rental Record for " + getName() + "\n";
+      for (Rental each : rentals) {
+        // 积分计算的方法
+        frequentRenterPoints = each.frequentRenterCount();
+
+        result += "\t" + each.getMovie().getTitle() + "\t" + each.countAmount() + "\n";
+      }
+
+      result += " Amount owed is " + countTotalAmount() + "\n";
+      result += " You earned " + frequentRenterPoints + " frequent renter points";
+      return result;
+    }
+
+    /**
+     * 提取计算方法
+     *
+     * @return 值的计算
+     */
+    private double countTotalAmount() {
+      double totalAmount = 0;
+
+      for (Rental each : rentals) {
+        // 调用方法进行积分的计算
+        totalAmount += each.countAmount();
+      }
+
+      return totalAmount;
+    }
+
+
+

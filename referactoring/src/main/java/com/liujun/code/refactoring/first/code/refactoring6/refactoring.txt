@@ -1,0 +1,309 @@
+重构第一节：
+重构第一步，编写单元测试，确保数据能够达到预期的值，重构改变内部行为，外部不变
+
+
+现在提出了新的需求。修改影片分类的规则。之与相对的还有费用计算方式以及常客户计算方式，还有待确定。
+重构
+现在修改影片的分类，对于影片的分类，未来还有可能添加更多，所以影片的分类是可以扩展的，
+针对每个分类的影片，有两个行为：
+1，计算每类影片，有费用计算.
+2，影片还存在学，积分的计算.
+
+1,提取一个分类影片计算接口，包括费用计算，及积分计算。
+2.将相关的调用修改到新的计算中
+
+
+
+重构前:
+Rental
+ /**
+   * 将计算逻辑分离
+   *
+   * @return 积分计算
+   */
+  public double countAmount() {
+    double thisAmount = 0;
+    switch (this.getMovie().getPriceCode()) {
+        // 如果当前影片为普通片，且时间超过2天，则1.5倍积分
+      case Movie.REGULAR:
+        thisAmount += 2;
+        if (this.getDaysRented() > 2) {
+          thisAmount += (this.getDaysRented() - 2) * 1.5;
+        }
+        break;
+        // 新片为3倍租分
+      case Movie.NEW_RELEASE:
+        thisAmount += this.getDaysRented() * 3;
+        break;
+        // 儿童片，时间超过3天，1.5倍积分
+      case Movie.CHILDRENS:
+        thisAmount += 1.5;
+        if (this.getDaysRented() > 3) {
+          thisAmount += (this.getDaysRented() - 3) * 1.5;
+        }
+        break;
+    }
+    return thisAmount;
+  }
+
+  /**
+   * 积分计算方法
+   *
+   * @return 积分
+   */
+  public int frequentRenterCount() {
+    // 如果当前为新片，并且时间超过1天，则租户的点加1,用于表示租借了几部影片
+    if (this.getMovie().getPriceCode() == Movie.NEW_RELEASE && this.getDaysRented() > 1) {
+      return 2;
+    }
+
+    return 1;
+  }
+
+
+
+重构后：
+Rental
+ /**
+   * 费用计算的逻辑
+   *
+   * @return
+   */
+  public double getCharge() {
+    return movie.countAmount(daysRented);
+  }
+
+  /**
+   * 积分计算方法
+   *
+   * @return 积分
+   */
+  public int frequentRenterCount() {
+    return movie.frequentRenterCount(daysRented);
+  }
+
+
+
+ Movie
+public class Movie {
+
+  /** 影片分类，儿童类影片 */
+  public static final int CHILDRENS = MoveTypeEnum.CHILDREN.getType();
+
+  /** 普通影片 */
+  public static final int REGULAR = MoveTypeEnum.REGULAR.getType();
+
+  /** 新片 */
+  public static final int NEW_RELEASE = MoveTypeEnum.NEW_RELEASE.getType();
+
+  /** 标题 */
+  private String title;
+
+  /** 票价 */
+  private int priceCode;
+
+  /** 影片分类 */
+  private MoveTypeCountInf moveType;
+
+  public Movie(String title, int priceCode) {
+    this.title = title;
+    this.priceCode = priceCode;
+    // 获取分类计算实例
+    this.moveType = MoveTypeCount.getCountType(this.priceCode);
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public int getPriceCode() {
+    return priceCode;
+  }
+
+  /**
+   * 将计算逻辑分离
+   *
+   * @return 积分计算
+   */
+  public double countAmount(int daysRented) {
+    return this.moveType.countAmount(daysRented);
+  }
+
+  /**
+   * 积分计算方法
+   *
+   * @return 积分
+   */
+  public int frequentRenterCount(int daysRented) {
+    return this.moveType.frequentRenterCount(daysRented);
+  }
+}
+
+影片分类枚举
+public enum MoveTypeEnum {
+
+  /** 影片分类，儿童类影片 */
+  CHILDREN(2),
+
+  /** 普通影片 */
+  REGULAR(0),
+
+  /** 新片 */
+  NEW_RELEASE(1);
+
+  private int type;
+
+  MoveTypeEnum(int type) {
+    this.type = type;
+  }
+
+  public int getType() {
+    return type;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("MoveTypeEnum{");
+    sb.append("type=").append(type);
+    sb.append('}');
+    return sb.toString();
+  }
+}
+
+
+--分类计算对外统一调用
+public class MoveTypeCount {
+
+  /** 影片分类计算信息存储 */
+  private static final Map<Integer, MoveTypeCountInf> MOVE_TYPE_MAP = new HashMap<>();
+
+  static {
+    // 儿童片的计算
+    MOVE_TYPE_MAP.put(MoveTypeEnum.CHILDREN.getType(), new ChildrenMove());
+    // 正常影片计算
+    MOVE_TYPE_MAP.put(MoveTypeEnum.REGULAR.getType(), new RegularMove());
+    // 新影片的计算
+    MOVE_TYPE_MAP.put(MoveTypeEnum.NEW_RELEASE.getType(), new NewReleaseMove());
+  }
+
+  /**
+   * 获取影片分类的计算实体,及其计算过程封装
+   *
+   * @param typeValue
+   * @return
+   */
+  public static MoveTypeCountInf getCountType(int typeValue) {
+    MoveTypeCountInf type = MOVE_TYPE_MAP.get(typeValue);
+    if (null != type) {
+      return type;
+    }
+    // 如果
+    return MOVE_TYPE_MAP.get(MoveTypeEnum.REGULAR.getType());
+  }
+}
+
+
+分类计算接口
+public interface MoveTypeCountInf {
+
+  /**
+   * 费用计算的逻辑
+   *
+   * @param daysRented 租用时间
+   * @return 费用计算
+   */
+  double countAmount(int daysRented);
+
+  /**
+   * 积分计算方法
+   *
+   * @param daysRented 租用时间
+   * @return 积分
+   */
+  int frequentRenterCount(int daysRented);
+}
+
+
+儿童片计算
+public class ChildrenMove implements MoveTypeCountInf {
+
+  private static final double DEFAULT_VALUE = 1.5;
+
+  /** 减免期 */
+  private static final double USE_VALUE = 3;
+
+  /** 积分点 */
+  private static final int FREQUENT_RENTER = 1;
+
+  @Override
+  public double countAmount(int daysRented) {
+    double thisAmount = DEFAULT_VALUE;
+    if (daysRented > USE_VALUE) {
+      thisAmount += (daysRented - USE_VALUE) * DEFAULT_VALUE;
+    }
+
+    return thisAmount;
+  }
+
+  @Override
+  public int frequentRenterCount(int daysRented) {
+    return FREQUENT_RENTER;
+  }
+}
+
+新片计算
+public class NewReleaseMove implements MoveTypeCountInf {
+
+  /** 减免期 */
+  private static final double USE_VALUE = 3;
+
+  /** 积分点 */
+  private static final int FREQUENT_RENTER = 1;
+
+  /** 积分点 */
+  private static final int FREQUENT_RENTER_TWO = 2;
+
+  @Override
+  public double countAmount(int daysRented) {
+    double thisAmount = daysRented * USE_VALUE;
+
+    return thisAmount;
+  }
+
+  @Override
+  public int frequentRenterCount(int daysRented) {
+
+    if (daysRented > 1) {
+      return FREQUENT_RENTER_TWO;
+    }
+
+    return FREQUENT_RENTER;
+  }
+}
+
+普通片计算
+public class RegularMove implements MoveTypeCountInf {
+
+  private static final double DEFAULT_VALUE = 1.5;
+
+  /** 费用 */
+  private static final double COUNT_PRICE = 2;
+
+  /** 积分点 */
+  private static final int FREQUENT_RENTER = 1;
+
+  @Override
+  public double countAmount(int daysRented) {
+    double thisAmount = COUNT_PRICE;
+    if (daysRented > COUNT_PRICE) {
+      thisAmount += (daysRented - COUNT_PRICE) * DEFAULT_VALUE;
+    }
+
+    return thisAmount;
+  }
+
+  @Override
+  public int frequentRenterCount(int daysRented) {
+    return FREQUENT_RENTER;
+  }
+}

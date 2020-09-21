@@ -1,0 +1,19 @@
+Inline Method(内联函数）
+
+有些函数的的内部代码与函数名同样清晰易读，也可能重构了函数，使期函数清晰易读。
+这种情况，就应该去掉这个代码，直接使用其代码
+
+重构前:
+public int getReting() {
+    return (moreThanFiveLateDeliveries()) ? 2 : 1;
+  }
+
+  private boolean moreThanFiveLateDeliveries() {
+    return numberOfLateDeliveries > 5;
+  }
+
+  重构后:
+
+  public int getReting() {
+    return (numberOfLateDeliveries > 5) ? 2 : 1;
+  }

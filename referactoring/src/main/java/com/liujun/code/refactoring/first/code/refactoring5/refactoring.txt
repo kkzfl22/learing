@@ -1,0 +1,86 @@
+重构第一节：
+重构第一步，编写单元测试，确保数据能够达到预期的值，重构改变内部行为，外部不变
+
+重构
+去除临时变量frequentRenterPoints
+
+关于重构问题
+代码行数:经过几次的重构，代码的行数不仅没有减少，反而还会增加。这是有可能存在的，但大多数的重构，还是在减少代码
+
+性能: 原来一次的循环，新版本却要三次循环，如果for循环耗时很多，那可能就会大大的降低程序的性能。
+请注意“如果”和“可能”，在没有进行评测前进行评测，是无法确定循环的执行时间，也无法知道这个程序是否被经常使用以至于影响性能。
+重构时不必担心这些问题，优化时才需要担心他们，但在优化阶段，你已经处于更有利的位置。有多的选择可以完成有效的优化。
+
+
+
+重构前:
+Customer
+ /**
+    * 生成详单的函数
+    *
+    * @return
+    */
+   public String statement() {
+     int frequentRenterPoints = 0;
+     String result = "Rental Record for " + getName() + "\n";
+     for (Rental each : rentals) {
+       // 积分计算的方法
+       frequentRenterPoints = each.frequentRenterCount();
+
+       result += "\t" + each.getMovie().getTitle() + "\t" + each.countAmount() + "\n";
+     }
+
+     result += " Amount owed is " + countTotalAmount() + "\n";
+     result += " You earned " + frequentRenterPoints + " frequent renter points";
+     return result;
+   }
+
+
+
+  重构后:
+/**
+   * 生成详单的函数
+   *
+   * @return
+   */
+  public String statement() {
+    String result = "Rental Record for " + getName() + "\n";
+    for (Rental each : rentals) {
+      result += "\t" + each.getMovie().getTitle() + "\t" + each.countAmount() + "\n";
+    }
+
+    result += " Amount owed is " + countTotalAmount() + "\n";
+    result += " You earned " + frequentRenterPointCount() + " frequent renter points";
+    return result;
+  }
+
+  /**
+   * 提取计算方法
+   *
+   * @return 值的计算
+   */
+  private double countTotalAmount() {
+    double totalAmount = 0;
+
+    for (Rental each : rentals) {
+      // 调用方法进行积分的计算
+      totalAmount += each.countAmount();
+    }
+
+    return totalAmount;
+  }
+
+  /**
+   * 计算用户租借点
+   *
+   * @return
+   */
+  private int frequentRenterPointCount() {
+    int frequentRenterPoints = 0;
+
+    for (Rental each : rentals) {
+      // 租户点计算
+      frequentRenterPoints = each.frequentRenterCount();
+    }
+    return frequentRenterPoints;
+  }

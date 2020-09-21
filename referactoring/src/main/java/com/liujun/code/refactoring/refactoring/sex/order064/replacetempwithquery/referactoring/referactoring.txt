@@ -1,0 +1,138 @@
+Replace Temp With Query(以查询取代临时变量)
+
+程序以一个临时变量的形式保存表达式的运算结果。
+将表达式提练到一个独立的函数中，将这个临时变量的所有引用点替换为对所有函数的引用。
+此后，新函数可以被其他函数使用。
+
+
+ 重构方法：
+ 1，将临时变量声明添加final，
+ 2，检查编译是否通过。
+ 3，首先将函数的访问改为private,日后需要共享，再进行修改。也非常容易。
+ 4，提练出函数。
+ 5，将原来的变量的引用改为对函数的引用。
+
+
+ 运用此手法，你可能会觉得存在性能问题。
+ 与其他性能问题一样，现在请忽略它，因为空十有八九不会造成性能问题。
+ 在经过测试后，真是性能问题，也可以在优化时期将它解决好。
+ 组织良好的代码，往往能发现更有效的优化方案。
+
+
+
+重构前:
+ public double count() {
+    double basePrice = quantity * itemPrice;
+    double discountFactor;
+    if (basePrice > 1000) {
+      discountFactor = 0.95;
+    } else {
+      discountFactor = 0.98;
+    }
+    return basePrice * discountFactor;
+  }
+
+
+ 重构步骤：
+ 1，将临时变量的声明修改为final
+进行编译，检查是否编译通过
+public double count() {
+    final double basePrice = quantity * itemPrice;
+    final double discountFactor;
+    if (basePrice > 1000) {
+      discountFactor = 0.95;
+    } else {
+      discountFactor = 0.98;
+    }
+    return basePrice * discountFactor;
+  }
+
+当前编译通过，变量仅被使用一次，可以继续重构
+
+2，提取表达式函数。
+ public double count() {
+    final double basePrice = basePrice();
+    final double discountFactor;
+    if (basePrice > 1000) {
+      discountFactor = 0.95;
+    } else {
+      discountFactor = 0.98;
+    }
+    return basePrice * discountFactor;
+  }
+
+  private double basePrice()
+  {
+      return quantity * itemPrice;
+  }
+  编译测试。
+
+
+3，使用Replace Temmp with Query 来替代临时变量编译，测试
+public double count() {
+    final double basePrice = basePrice();
+    final double discountFactor;
+    if (basePrice() > 1000) {
+      discountFactor = 0.95;
+    } else {
+      discountFactor = 0.98;
+    }
+    return basePrice() * discountFactor;
+  }
+
+  private double basePrice()
+  {
+      return quantity * itemPrice;
+  }
+编译测试
+
+4.提取出discountFactor函数
+
+  public double count() {
+    final double discountFactor = discountFactor();
+    return basePrice() * discountFactor;
+  }
+
+  private double basePrice() {
+    return quantity * itemPrice;
+  }
+
+  private double discountFactor() {
+    final double discountFactor;
+    if (basePrice() > 1000) {
+      discountFactor = 0.95;
+    } else {
+      discountFactor = 0.98;
+    }
+
+    return discountFactor;
+  }
+编译测试
+
+ 5，去除临时变量
+  public double count() {
+    return basePrice() * discountFactor();
+  }
+
+  private double basePrice() {
+    return quantity * itemPrice;
+  }
+
+  private double discountFactor() {
+    final double discountFactor;
+    if (basePrice() > 1000) {
+      discountFactor = 0.95;
+    } else {
+      discountFactor = 0.98;
+    }
+
+    return discountFactor;
+  }
+
+  编译测试。
+
+
+代码最终就变成了
+ public double count() {
+    return basePrice() * discountFactor();
+  }

@@ -1,0 +1,83 @@
+重构第一节：
+重构第一步，编写单元测试，确保数据能够达到预期的值，重构改变内部行为，外部不变
+
+提取搬移方法
+按同样的方法提取积分计算方法，而且积分计算也只与rental相关，
+此种场景就需要进行提取方法，并搬移
+进行测试
+
+
+重构前:
+Costomer
+  /**
+   * 生成详单的函数
+   *
+   * @return
+   */
+  public String statement() {
+    double totalAmount = 0;
+    int frequentRenterPoints = 0;
+    String result = "Rental Record for " + getName() + "\n";
+    for (Rental each : rentals) {
+      // 调用方法进行积分的计算
+      double thisAmount = each.countAmount();
+
+      frequentRenterPoints++;
+      // 如果当前为新片，并且时间超过1天，则租户的点加1,用于表示租借了几部影片
+      if (each.getMovie().getPriceCode() == Movie.NEW_RELEASE && each.getDaysRented() > 1) {
+        frequentRenterPoints++;
+      }
+      result += "\t" + each.getMovie().getTitle() + "\t" + thisAmount + "\n";
+      totalAmount += thisAmount;
+    }
+
+    result += " Amount owed is " + totalAmount + "\n";
+    result += " You earned " + frequentRenterPoints + " frequent renter points";
+    return result;
+  }
+
+
+重构后:
+Costomer
+/**
+   * 生成详单的函数
+   *
+   * @return
+   */
+  public String statement() {
+    double totalAmount = 0;
+    int frequentRenterPoints = 0;
+    String result = "Rental Record for " + getName() + "\n";
+    for (Rental each : rentals) {
+      // 调用方法进行积分的计算
+      double thisAmount = each.countAmount();
+
+      // 积分计算的方法
+      frequentRenterPoints = each.frequentRenterCount();
+
+      result += "\t" + each.getMovie().getTitle() + "\t" + thisAmount + "\n";
+      totalAmount += thisAmount;
+    }
+
+    result += " Amount owed is " + totalAmount + "\n";
+    result += " You earned " + frequentRenterPoints + " frequent renter points";
+    return result;
+  }
+
+
+Rental
+ /**
+   * 积分计算方法
+   *
+   * @return 积分
+   */
+  public int frequentRenterCount() {
+    // 如果当前为新片，并且时间超过1天，则租户的点加1,用于表示租借了几部影片
+    if (this.getMovie().getPriceCode() == Movie.NEW_RELEASE && this.getDaysRented() > 1) {
+      return 2;
+    }
+
+    return 1;
+  }
+
+

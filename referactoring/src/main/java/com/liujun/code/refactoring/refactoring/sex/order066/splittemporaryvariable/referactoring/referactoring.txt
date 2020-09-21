@@ -1,0 +1,106 @@
+Split Temporary Variable (分解临时变量)
+
+如果程序 有某个临时变量被会赋值超过一次，它即不是循环变量，也不被用于收集计算结果
+针对每次的赋值，应该创建一个独立、对应的临时变量.
+
+针对临时变量来说，被多次赋值的典型场景：“循环变量”和“结果收集变量”
+
+如果临时变量被赋值超过一次，意味着它在函数中承担了一个以上的职责。
+
+如果一个变量承担了多个职责，就应该被替换为多个临时变量，每个变量只承担一个职责。
+
+同一个临时变量承担了两件不同的事情，会令代码阅读者糊涂。
+
+
+
+做法：
+1，将待分解的临时变量的声明及其第一次被赋值处，修改其名称
+2，将新的临时变量声明为final
+3, 以该临时变量的第二次赋值为界，修改变量的所有引用点，它让引用新的临时变量。
+4，在第二次赋值处，重新声明原来的临时变量。
+5，编译测试
+6，重复上述过程。
+
+
+原代码 ：
+public double getDistanceTravelled(int time) {
+    double result;
+    double acc = primaryForce * mass;
+    int primaryTime = Math.min(time, delay);
+    result = 0.5 * acc * primaryTime + primaryTime;
+    int secondaryTime = time - delay;
+    if (secondaryTime > 0) {
+      double primaryVel = acc * delay;
+      acc = (primaryForce + secondaryForce) / mass;
+      result += primaryVel * secondaryTime + 0.5 * acc * secondaryTime * secondaryTime;
+    }
+
+    return result;
+  }
+
+  重构
+  1,将原来的临时变量改名，并声明为final，修改引用
+    public double getDistanceTravelled(int time) {
+       double result;
+       //将原来的临时变量改名，并声明为final，修改引用
+       final double primaryAcc = primaryForce * mass;
+       int primaryTime = Math.min(time, delay);
+       result = 0.5 * primaryAcc * primaryTime + primaryTime;
+       int secondaryTime = time - delay;
+       if (secondaryTime > 0) {
+         double primaryVel = primaryAcc * delay;
+         //第二次赋值的地方重新声明。
+        double acc = (primaryForce + secondaryForce) / mass;
+         result += primaryVel * secondaryTime + 0.5 * acc * secondaryTime * secondaryTime;
+       }
+
+       return result;
+     }
+     编译并测试
+
+//2,欢于变量名进行修改命名。
+public double getDistanceTravelled(int time) {
+    double result;
+    // 将原来的临时变量改名，并声明为final，修改引用
+    final double primaryAcc = primaryForce * mass;
+    int primaryTime = Math.min(time, delay);
+    result = 0.5 * primaryAcc * primaryTime + primaryTime;
+    int secondaryTime = time - delay;
+    if (secondaryTime > 0) {
+      double primaryVel = primaryAcc * delay;
+      // 第二次重构，对临时变量的修改命名
+      final double secondaryAcc = (primaryForce + secondaryForce) / mass;
+      result += primaryVel * secondaryTime + 0.5 * secondaryAcc * secondaryTime * secondaryTime;
+    }
+
+    return result;
+  }
+
+
+//3，使用去除临时变量的方式进行重构
+public double getDistanceTravelled(int time) {
+    double result;
+    // 将原来的临时变量改名，并声明为final，修改引用
+    // 继续重构，去除临时变量
+    int primaryTime = Math.min(time, delay);
+    result = 0.5 * primaryAcc() * primaryTime + primaryTime;
+    int secondaryTime = time - delay;
+    if (secondaryTime > 0) {
+      // 同样去除临时变量
+      result += primaryVel() * secondaryTime + 0.5 * secondaryAcc() * secondaryTime * secondaryTime;
+    }
+
+    return result;
+  }
+
+  private double primaryAcc() {
+    return primaryForce * mass;
+  }
+
+  private double primaryVel() {
+    return primaryAcc() * delay;
+  }
+
+  private double secondaryAcc() {
+    return (primaryForce + secondaryForce) / mass;
+  }

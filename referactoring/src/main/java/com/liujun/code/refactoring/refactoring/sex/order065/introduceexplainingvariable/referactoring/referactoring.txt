@@ -1,0 +1,139 @@
+Introduce Explaining Variable (引用解释性变量）
+将一个复杂的表达式（或者其中一部分）的结果放进一个临时变量，以此变量名来解释表达式用途
+
+表达式太式非常难以阅读。在这种情况下，临时变量可能帮助你将表达式分解为比较容量管理的形式。
+
+做法
+1，声明一个final临时变量，将待分解的复杂表达中的一分部运算结果赋值给它。
+2，将表达式中的运算结果替换为临时变量。
+3，编译测试，
+4，重复上述过程。
+
+
+重构前代码
+  public double price() {
+    return quantity * itemPrice
+        - (Math.max(0, quantity - 500) * itemPrice * 0.05
+            + Math.min(quantity * itemPrice * 0.1, 100.0));
+  }
+
+
+使用解释性临时变量的方案重构
+ 1.
+ 提取表达式至临时变量中
+  public double price() {
+     // 将表达式中的部分提取，使用临时变量替代
+     final double basePrice = quantity * itemPrice;
+
+     return basePrice
+         - (Math.max(0, quantity - 500) * itemPrice * 0.05
+             + Math.min(basePrice * 0.1, 100.0));
+   }
+  编译测试
+
+
+ 2.
+ 继续提取临时变量
+public double price() {
+    // 将表达式中的部分提取，使用临时变量替代
+    final double basePrice = quantity * itemPrice;
+    //再次提取临时变量
+    final double quantityDiscount = (Math.max(0, quantity - 500) * itemPrice * 0.05);
+
+    return basePrice - quantityDiscount + Math.min(basePrice * 0.1, 100.0);
+  }
+  //编译测试
+
+
+3.将最后一个表达式也提取到变量中
+public double price() {
+    // 将表达式中的部分提取，使用临时变量替代
+    final double basePrice = quantity * itemPrice;
+    // 再次提取临时变量
+    final double quantityDiscount = (Math.max(0, quantity - 500) * itemPrice * 0.05);
+    // 提取最后一个表达式
+    final double shipping = Math.min(basePrice * 0.1, 100.0);
+
+    return basePrice - quantityDiscount + shipping;
+  }
+
+
+
+使用提取方法的方式重构：
+原始代码
+public double price() {
+    return quantity * itemPrice
+        - (Math.max(0, quantity - 500) * itemPrice * 0.05
+            + Math.min(quantity * itemPrice * 0.1, 100.0));
+  }
+
+
+
+重构1
+//1,提取基础价格函数
+public double price() {
+    return basePrice()
+        - (Math.max(0, quantity - 500) * itemPrice * 0.05)
+        + Math.min(basePrice() * 0.1, 100.0);
+  }
+
+  /**
+   * 基础的价格函数
+   *
+   * @return
+   */
+  private double basePrice() {
+    return quantity * itemPrice;
+  }
+
+  编译，测试
+
+
+//2,继续提取函数
+ /**
+   * 计算价格
+   *
+   * @return
+   */
+  public double price() {
+    return basePrice() - quantityDiscount() + Math.min(basePrice() * 0.1, 100.0);
+  }
+
+  /**
+   * 基础的价格函数
+   *
+   * @return
+   */
+  private double basePrice() {
+    return quantity * itemPrice;
+  }
+
+  private double quantityDiscount() {
+    return Math.max(0, quantity - 500) * itemPrice * 0.05;
+  }
+
+  编译并测试
+
+
+//3，最后一个表达式重构
+public double price() {
+    return basePrice() - quantityDiscount() + shipping();
+  }
+
+  /**
+   * 基础的价格函数
+   *
+   * @return
+   */
+  private double basePrice() {
+    return quantity * itemPrice;
+  }
+
+  private double quantityDiscount() {
+    return Math.max(0, quantity - 500) * itemPrice * 0.05;
+  }
+
+  private double shipping() {
+    return Math.min(basePrice() * 0.1, 100.0);
+  }
+编译并测试

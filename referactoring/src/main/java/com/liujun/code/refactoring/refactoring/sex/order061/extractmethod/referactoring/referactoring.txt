@@ -1,0 +1,142 @@
+重构无局部变量的函数
+
+针对DataDemo执行重构
+1，将无局部变量的函数先提练到单独的函数中
+
+/** 执行打印 */
+  void printOwing() {
+    Iterator<Order> e = valueList.iterator();
+
+    double outstanding = 0.0;
+
+    // print banner
+    System.out.println("*************************************************");
+    System.out.println("************** Customer Owes ********************");
+    System.out.println("*************************************************");
+
+    while (e.hasNext()) {
+      Order order = e.next();
+      outstanding += order.getAmount();
+    }
+
+    // print detail
+    System.out.println("name:" + name);
+    System.out.println("amount " + outstanding);
+  }
+
+
+ 重构 1
+ 将打印信息提练到单独的函数中
+ void printOwing() {
+    Iterator<Order> e = valueList.iterator();
+
+    double outstanding = 0.0;
+
+    // print banner
+    printBanner();
+
+    while (e.hasNext()) {
+      Order order = e.next();
+      outstanding += order.getAmount();
+    }
+
+    // print detail
+    System.out.println("name:" + name);
+    System.out.println("amount " + outstanding);
+  }
+
+  /** 提取打印方法 */
+  private void printBanner() {
+    System.out.println("*************************************************");
+    System.out.println("************** Customer Owes ********************");
+    System.out.println("*************************************************");
+  }
+
+
+  重构2
+  简单的携带参数，提练到方法中
+void printOwing() {
+    Iterator<Order> e = valueList.iterator();
+
+    double outstanding = 0.0;
+
+    // print banner
+    printBanner();
+
+    while (e.hasNext()) {
+      Order order = e.next();
+      outstanding += order.getAmount();
+    }
+
+    // print detail
+    printDetail(outstanding);
+  }
+
+  /** 提取打印方法 */
+  private void printBanner() {
+    System.out.println("*************************************************");
+    System.out.println("************** Customer Owes ********************");
+    System.out.println("*************************************************");
+  }
+
+  /**
+   * 提练带参数的函数，需要携带参数
+   *
+   * @param outstanding
+   */
+  private void printDetail(double outstanding) {
+    // print detail
+    System.out.println("name:" + name);
+    System.out.println("amount " + outstanding);
+  }
+
+
+//重构3，
+对局部变量再赋值
+
+  void printOwing() {
+    // print banner
+    printBanner();
+
+    // 计算函数分离
+    double outstanding = countOutStand();
+
+    // print detail
+    printDetail(outstanding);
+  }
+
+  /** 提取打印方法 */
+  private void printBanner() {
+    System.out.println("*************************************************");
+    System.out.println("************** Customer Owes ********************");
+    System.out.println("*************************************************");
+  }
+
+  /**
+   * 提练带参数的函数，需要携带参数
+   *
+   * @param outstanding
+   */
+  private void printDetail(double outstanding) {
+    // print detail
+    System.out.println("name:" + name);
+    System.out.println("amount " + outstanding);
+  }
+
+  /**
+   * 计算函数分离
+   *
+   * @return
+   */
+  private double countOutStand() {
+    Iterator<Order> e = valueList.iterator();
+    double outstanding = 0.0;
+
+    while (e.hasNext()) {
+      Order order = e.next();
+      outstanding += order.getAmount();
+    }
+
+    return outstanding;
+  }
+
