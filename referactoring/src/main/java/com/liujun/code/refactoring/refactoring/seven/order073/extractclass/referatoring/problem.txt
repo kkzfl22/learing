@@ -1,0 +1,9 @@
+如果公开了TelephoneNumber，而有个用户修改了对象中的areaCode字段值，我又怎么知道呢？
+而且做出修改可能不是直接用户，而是用户的用户的用户。
+
+当面对这个问题，可以有这样几种选择：
+1，允许任务对象修改TelephoneNumber对象的任务部分。这就使得TelephoneNumber对象成为引用对象。应该考滤使用ChangeValueToFeference
+这种情况，Person应该是TelephoneNumber是访问点
+2,不许任何人不通过Person对象就修改TelephoneNumber对象，为此，可以将TelephoneNumber设为不可修改。或为其提供一个不可修改的接口。
+3，还有一个办法就是先复制一个TelephoneNumber对象，然后将复制得到的新对象传递给用户。但这可能会造成一定程度为迷惑，因为人们会认为
+他们可以修改TelephoneNumber对象值，此外如果同一个TelephoneNumber对象被传递给多个有挺远呢，可能在用户之间造成别名问题。

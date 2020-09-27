@@ -1,0 +1,103 @@
+重构方式2：
+优先在源类使用SelfEncapsulate field（自我封装），然后再修改引用
+
+源:
+public class Account {
+
+  private final AccountType type;
+
+  /** 利率计算 */
+  private double interestRate;
+
+  public Account(AccountType type, double interestRate) {
+    this.type = type;
+    this.interestRate = interestRate;
+  }
+
+  /**
+   * 利率计算
+   *
+   * @param amount
+   * @param days
+   * @return
+   */
+  double interestForAmountDays(double amount, int days) {
+    return interestRate * amount * days / 365;
+  }
+}
+
+重构：
+修改源类中的引用关系，将变量的直接引用变为对get/set方法的调用。
+public class Account {
+
+  private final AccountType type;
+
+  /** 利率计算 */
+  private double interestRate;
+
+  public Account(AccountType type) {
+    this.type = type;
+  }
+
+  /**
+   * 利率计算
+   *
+   * @param amount
+   * @param days
+   * @return
+   */
+  double interestForAmountDays(double amount, int days) {
+    return getInterestRate() * amount * days / 365;
+  }
+
+
+  public double getInterestRate() {
+    return interestRate;
+  }
+
+  public void setInterestRate(double interestRate) {
+    this.interestRate = interestRate;
+  }
+}
+
+2,将相关的设置函数搬移到目标函数中
+@Setter
+@Getter
+@ToString
+public class AccountType {
+
+  /** 利率计算 */
+  private double interestRate;
+}
+
+3,修改源类的引用
+public class Account {
+
+  private final AccountType type;
+
+  public Account(AccountType type) {
+    this.type = type;
+  }
+
+  /**
+   * 利率计算
+   *
+   * @param amount
+   * @param days
+   * @return
+   */
+  double interestForAmountDays(double amount, int days) {
+    return getInterestRate() * amount * days / 365;
+  }
+
+  public double getInterestRate() {
+    return type.getInterestRate();
+  }
+
+  public void setInterestRate(double interestRate) {
+    type.setInterestRate(interestRate);
+  }
+}
+
+4，执行单元测试
+

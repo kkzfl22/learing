@@ -1,0 +1,74 @@
+Inline Class(将类内联化)
+
+某个类没有做太多的事情，将这个类的所有特性搬移到另一个类中，然后移除原类。
+
+Inline Class正好与Extract Class相反。如果一个类不再承担足够的责任。不再有单独存在的理由。
+可以将这个类塞进另一个类中。
+
+
+做法：
+1，在目标类身上声明源类的public协议，并将其中所有的函数委托至源类。
+2，修改所有源引用点。改而引用目标类。
+3，编译，测试
+4，运用Move Method(142)和Move Field(146)，将源类的特性全部搬移到目标类。
+5，将另外一个类移除。
+
+
+
+重构前:
+public class Person {
+
+  /** 名称 */
+  private String name;
+
+  /** 电话号码 */
+  private TelephoneNumber telephoneNumber = new TelephoneNumber();
+
+  public Person(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getTelephoneNumber() {
+    return "(" + telephoneNumber.getOfficeAreaCode() + ")" + telephoneNumber.getOfficeNumber();
+  }
+
+  /** @return */
+  public TelephoneNumber getOfficeTelephone() {
+    return telephoneNumber;
+  }
+}
+public class TelephoneNumber {
+
+  private String officeAreaCode;
+
+  private String officeNumber;
+
+  public String getTelephoneNumber() {
+    return "(" + getOfficeAreaCode() + ")" + getOfficeNumber();
+  }
+
+
+  public String getOfficeAreaCode() {
+    return officeAreaCode;
+  }
+
+  public void setOfficeAreaCode(String officeAreaCode) {
+    this.officeAreaCode = officeAreaCode;
+  }
+
+  public String getOfficeNumber() {
+    return officeNumber;
+  }
+
+  public void setOfficeNumber(String officeNumber) {
+    this.officeNumber = officeNumber;
+  }
+}
+
+
+重构：
+如果当前需要将telephonePhone塞回到Person类去。

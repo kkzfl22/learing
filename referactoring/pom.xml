@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.liujun.code.referactoring</groupId>
-    <artifactId>referactoring</artifactId>
+    <artifactId>refactoring</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -47,6 +47,19 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
+        </dependency>
+
     </dependencies>
 
     <build>

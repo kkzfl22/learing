@@ -1,0 +1,34 @@
+Subsitute Algorithm(替换算法）
+将函数本体替换为另一个算法。
+
+重构前:
+public class AlgorithmData {
+
+  public String foundPerson(String[] people) {
+    for (int i = 0; i < people.length; i++) {
+      if (people[i].equals("Don")) {
+        return "Don";
+      }
+      if (people[i].equals("John")) {
+        return "John";
+      }
+      if (people[i].equals("Kent")) {
+        return "Kent";
+      }
+    }
+    return "";
+  }
+}
+
+重构后
+public String foundPerson(String[] people) {
+    List<String> candidates = Arrays.asList(new String[] {"Don", "John", "Kent"});
+
+    for (int i = 0; i < people.length; i++) {
+      if (candidates.contains(people[i])) {
+        return people[i];
+      }
+    }
+
+    return "";
+  }

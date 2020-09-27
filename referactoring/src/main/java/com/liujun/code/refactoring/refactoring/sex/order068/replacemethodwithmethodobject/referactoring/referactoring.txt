@@ -1,0 +1,89 @@
+Replace Method with Method Object  以函数对象取代函数
+
+将一个大型的函数放进一对象中，如此一来局部变量就成了对象内的字段，然后就可以在同一个对象中将这个大型函数分解为多个小型函数
+
+做法:
+1，新建立一个类，根据待处理函数的用途，为这个类命名
+2，在新类中建立一个final字段，用以保存原先大型函数所在的对象。可将这个对象称为“源对象”，
+同时将针对源函数的每个临时变量和每个参数，在新类中建立一个应对的字段保存。
+3，在新类中建立一个构建函数，接收源对象及原函数的所有参数作为参数
+4，在新类中建立一个compute()函数
+5，将原函数的代码处理到compute()函数，如果需要调用源对象的任务函数，通过源对象字段调用。
+6，编译并测试。
+
+重构前
+public class Account {
+
+  public int gama(int inputVal, int quantity, int yarToDate) {
+    int importantValue1 = (inputVal * quantity) + delta();
+    int importantValue2 = (inputVal * yarToDate) + 100;
+    if (yarToDate - importantValue1 > 1000) {
+      importantValue2 -= 20;
+    }
+    int importantValue3 = importantValue2 * 7;
+    return importantValue3 - 2 * importantValue1;
+  }
+
+  private int delta() {
+    return 2000;
+  }
+}
+
+
+重构：
+1，声明一个新的类，用于进行临时变量的处理
+public class Gamma {
+
+  private final Account account;
+
+  private int inputVal;
+
+  private int quantity;
+
+  private int yarToDate;
+
+  private int importantValue1;
+
+  private int importantValue2;
+
+  private int importantValue3;
+
+  public Gamma(Account account, int inputVal, int quantity, int yarToDate) {
+    this.account = account;
+    this.inputVal = inputVal;
+    this.quantity = quantity;
+    this.yarToDate = yarToDate;
+  }
+
+  public int compute() {
+    importantValue1 = (inputVal * quantity) + account.delta();
+    importantValue2 = (inputVal * yarToDate) + 100;
+    //由于提取临时变量全被提取到类中，克可以任意重构。
+    importantThingCount();
+    importantValue3 = importantValue2 * 7;
+    return importantValue3 - 2 * importantValue1;
+  }
+
+  private void importantThingCount() {
+    if (yarToDate - importantValue1 > 1000) {
+      importantValue2 -= 20;
+    }
+  }
+}
+
+
+2,修改原来函数，让其调用新类
+public class Account {
+
+    public int gama(int inputVal, int quantity, int yarToDate) {
+        return new Gamma(this,inputVal,inputVal,yarToDate).compute();
+    }
+
+    public int delta() {
+        return 2000;
+    }
+
+}
+
+
+3，编译并测试
