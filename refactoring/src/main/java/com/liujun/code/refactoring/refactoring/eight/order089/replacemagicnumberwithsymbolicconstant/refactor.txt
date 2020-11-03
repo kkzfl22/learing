@@ -1,0 +1,20 @@
+Replace Magic Number with Symbolic Constant(以字面量取代魔法数)
+
+在代码中存在一个字面数值，带有特别的含义，
+创造一个常量，根据其意义将它命名，并将上述的字面数值替换为这个常量
+
+在计算科学中，魔法数（magic number）是历史最悠久的不良现象之一。
+
+重构前
+double potentialEnergy(double mass,double height){
+    return mass * 9.81 * height;
+}
+
+
+重构后：
+private static final double GRAVITATIONAL_CONSTANT = 9.81;
+
+double potentialEnergy(double mass,double height)
+{
+    return mass * GRAVITATIONAL_CONSTANT * height;
+}

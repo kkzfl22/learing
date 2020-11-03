@@ -1,0 +1,89 @@
+Replace Data Value With Object (以对象取值代数据值)
+
+重构产生的原因:
+在开发的初期，往往都只会以简单的数据项来表示简单的情况，但是随着开发的进行，后来的数据项已经变得不再简单了
+可以以手机号为例，刚开始只有手机号，后续添加地区，及国际化编码。等等，及一些特殊的号码格式。
+可以把相关数据项放入所属的对象里，但是Duplicate Code坏味道及Feature Envy坏味道很快从代码中散发出来。
+当这些坏味道开始出现，就应该将数据值变成对象。
+
+做法：
+1，为待替换数值新建一个类，在其中声明一个final字段，其类型和源类中的待替换数值类型一样，
+然后在新类中加入这个字段的取值函数，再加一个接收此字段的为参数的构建函数
+2，编译
+3，将源类中的待替换数值字段类型改为前面新建的类。
+4，修改源类中该字段取值函数，令它改用新类的取值函数。
+5，如果源类构造函数中用到这个待替换字段（多半是赋值动作），就修改构造函数，令它改用新类的构建函数来对字段进行赋值动作。
+6，修改源类中待替换字段的设值函数，令它为新类创建一个实际。
+7，编译，测试
+8，还可能需要对新类使用Change Value to Reference
+
+src:
+public class Order {
+
+  private String arg;
+
+  private String customer;
+
+  public Order(String customer) {
+    this.customer = customer;
+  }
+
+  public String getArg() {
+    return arg;
+  }
+
+  public void setArg(String arg) {
+    this.arg = arg;
+  }
+
+  public String getCustomer() {
+    return customer;
+  }
+
+  public void setCustomer(String customer) {
+    this.customer = customer;
+  }
+}
+
+
+refactor:
+public class Order {
+
+  private String arg;
+
+  private Customer customer;
+
+  public Order(String customerName) {
+    this.customer = new Customer(customerName);
+  }
+
+  public String getArg() {
+    return arg;
+  }
+
+  public void setArg(String arg) {
+    this.arg = arg;
+  }
+
+  public String getCustomer() {
+    return this.customer.getCustomer();
+  }
+
+  public void setCustomer(String customerName) {
+    this.customer = new Customer(customerName);
+  }
+}
+
+public class Customer {
+
+  private final String customer;
+
+  public Customer(String customer) {
+    this.customer = customer;
+  }
+
+  public String getCustomer() {
+    return customer;
+  }
+}
+

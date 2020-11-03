@@ -1,0 +1,210 @@
+Replace Type Code with Subclasses(以子类取代类型码)
+
+如果存在一个不可变的类型码，它会影响类的行为，可以使用子类取代这个类型码
+
+原因:
+任何接收类型码作为参数的函数，所期望的实际上只一个数值，无法强制使用符号名。
+这会大大降低代码的可读性，从而成为bug之源。
+但如果类型码会影响宿主类的行为，那么最好的办法就是借助多态来处理变化行为。
+
+
+做法:
+1,使用Self Encapsulate Field将类型码自我封装起来。
+2，为类型码的每一个数值建立一个相应的类，在每个子类中覆写类型码的取值函数，使其返回相应的类型码值。
+3，每建立一个子类，编译并测试
+4，从超类中删除保存类型码的字段，将类型码访问函数声明为抽象函数。
+5，编译，测试。
+
+
+以员工薪资为例
+src
+public class Employee {
+
+  private int type;
+
+  static final int ENGINEER = 0;
+
+  static final int SALESMAN = 1;
+
+  static final int MANAGER = 2;
+
+  Employee(int type) {
+    this.type = type;
+  }
+}
+
+
+refactor:
+1,封装类型码
+public class Employee {
+
+  private int type;
+
+  static final int ENGINEER = 0;
+
+  static final int SALESMAN = 1;
+
+  static final int MANAGER = 2;
+
+  Employee(int type) {
+    this.type = type;
+  }
+
+  /**
+   * 封装类型码
+   *
+   * @return
+   */
+  public int getType() {
+    return type;
+  }
+}
+
+2，私有化构建函数，并提供工厂方法
+public class Employee {
+
+  private int type;
+
+  static final int ENGINEER = 0;
+
+  static final int SALESMAN = 1;
+
+  static final int MANAGER = 2;
+
+  /**
+   * 私有化构建函数
+   *
+   * @param type
+   */
+  private Employee(int type) {
+    this.type = type;
+  }
+
+  /**
+   * 提供工厂方法，以执行类的创建
+   *
+   * @param type
+   * @return
+   */
+  public static Employee create(int type) {
+    return new Employee(type);
+  }
+
+  /**
+   * 封装类型码
+   *
+   * @return
+   */
+  public int getType() {
+    return type;
+  }
+}
+
+3：添加子类：Engineer,SalesMan,Manager，同时修改创建工厂，并返回合适的对象
+public class Engineer extends Employee {
+
+  @Override
+  public int getType() {
+    return Employee.ENGINEER;
+  }
+}
+
+public class SalesMan extends Employee {
+
+  @Override
+  public int getType() {
+    return Employee.SALESMAN;
+  }
+}
+
+public class Manager extends Employee {
+
+  @Override
+  public int getType() {
+    return Employee.MANAGER;
+  }
+}
+
+
+public class Employee {
+
+  private int type;
+
+  static final int ENGINEER = 0;
+
+  static final int SALESMAN = 1;
+
+  static final int MANAGER = 2;
+
+
+
+  /**
+   * 提供工厂方法，以执行类的创建
+   *
+   * @param type
+   * @return
+   */
+  public static Employee create(int type) {
+    if (type == ENGINEER) {
+      return new Employee();
+    } else if (type == SALESMAN) {
+      return new SalesMan();
+    } else if (type == MANAGER) {
+      return new Manager();
+    } else {
+      return new Employee();
+    }
+  }
+
+  /**
+   * 封装类型码
+   *
+   * @return
+   */
+  public int getType() {
+    return type;
+  }
+}
+
+
+5，移除employee类中保存类型码的字段，并声明为一个抽象函数。
+最终的结果:
+public abstract class Employee {
+
+  static final int ENGINEER = 0;
+
+  static final int SALESMAN = 1;
+
+  static final int MANAGER = 2;
+
+  /**
+   * 提供工厂方法，以执行类的创建
+   *
+   * @param type
+   * @return
+   */
+  public static Employee create(int type) {
+    if (type == ENGINEER) {
+      return new Engineer();
+    } else if (type == SALESMAN) {
+      return new SalesMan();
+    } else if (type == MANAGER) {
+      return new Manager();
+    } else {
+      throw new IllegalArgumentException("new create error");
+    }
+  }
+
+  /**
+   * 封装类型码
+   *
+   * @return
+   */
+  public abstract int getType();
+}
+
+6,编译测试
+
+
+
+

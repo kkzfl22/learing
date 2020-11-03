@@ -1,0 +1,275 @@
+Replace Subclass With Fields(以字段取代子类)
+
+各个子类的唯一差别只在“反回常量”的函数身上
+修改这些函数，使它们返回超类中的某个新增字段，然后销毁子类。
+
+
+原因：
+建立子类的目的是为了增加新特性或变化其行为，有一种变化称为“常量函数”，它们返回一个研编码值。
+尽管常量函数有其用途，但若子类中只有常量函数，实在没有足够的存在价值。
+
+
+做法：
+1，对所有子类使用Replace Constructor with Factory Method(304)
+2，如果有任何代码直接引用子类，令它改变引用超类
+3，针对每一个常量函数，在超类中声明一个final字段。
+4，为超类声明一个protected构造函数，用以初始化这些新增字段。
+5，新增或者修改子类构造函数，使它调用超类的新增构造函数。
+6，编译、测试
+7，在超类中实现所有常量函数，令它们返回相应字段值，然后将该函数从子类中删除
+8，每删除一个常量函数，编译并测试
+9，子类中所有的常量函数删除后，使用inline Method将子类构建函数内联到超类的工厂函数中
+10，编译，测试
+11，将子类删除
+12，编译，测试
+13，重复“内联构建函数、删除子类”过程，直到所有子类都被删除。
+
+
+src:
+public abstract class Person {
+
+  abstract boolean isMale();
+
+  abstract char getCode();
+}
+
+public class Male extends Person {
+
+  @Override
+  boolean isMale() {
+    return true;
+  }
+
+  @Override
+  char getCode() {
+    return 'M';
+  }
+}
+
+public class Female extends Person {
+
+  @Override
+  boolean isMale() {
+    return false;
+  }
+
+  @Override
+  char getCode() {
+    return 'F';
+  }
+}
+
+refactor:
+1,为每个子类建立一个工厂函数
+public abstract class Person {
+
+  abstract boolean isMale();
+
+  abstract char getCode();
+
+  /**
+   * 首先为每个子类建立工厂函数
+   *
+   * @return
+   */
+  static Person createMale() {
+    return new Male();
+  }
+
+  static Person createFemale() {
+    return new Female();
+  }
+}
+
+2,针对每个常量函数，在超类中声明一个对应的字段，并创建一个protect构造函数
+public abstract class Person {
+
+  /**
+   * 针对每个常量在超类中声明一个对应字段
+   *
+   * @param isMale
+   * @param code
+   */
+  private final boolean isMale;
+
+  private final char code;
+
+  /**
+   * 为超类加一个个protected构建函数
+   *
+   * @param isMale
+   * @param code
+   */
+  protected Person(boolean isMale, char code) {
+    this.isMale = isMale;
+    this.code = code;
+  }
+
+  abstract boolean isMale();
+
+  abstract char getCode();
+
+  /**
+   * 首先为每个子类建立工厂函数
+   *
+   * @return
+   */
+  static Person createMale() {
+    return new Male();
+  }
+
+  static Person createFemale() {
+    return new Female();
+  }
+}
+
+3，再为子类增加构造函数
+public class Male extends Person {
+
+  public Male() {
+    super(true, 'M');
+  }
+
+  @Override
+  boolean isMale() {
+    return true;
+  }
+
+  @Override
+  char getCode() {
+    return 'M';
+  }
+}
+
+public class Female extends Person {
+
+  public Female() {
+    super(false, 'F');
+  }
+
+  @Override
+  boolean isMale() {
+    return false;
+  }
+
+  @Override
+  char getCode() {
+    return 'F';
+  }
+}
+
+4,在超类中加入字段的函数，删除子类中的常量函数
+public abstract class Person {
+
+  /**
+   * 针对每个常量在超类中声明一个对应字段
+   *
+   * @param isMale
+   * @param code
+   */
+  private final boolean isMale;
+
+  private final char code;
+
+  /**
+   * 为超类加一个个protected构建函数
+   *
+   * @param isMale
+   * @param code
+   */
+  protected Person(boolean isMale, char code) {
+    this.isMale = isMale;
+    this.code = code;
+  }
+
+  /**
+   * 在超类中加入常量函数
+   *
+   * @return
+   */
+  boolean isMale() {
+    return isMale;
+  }
+
+  char getCode() {
+    return code;
+  }
+
+  /**
+   * 首先为每个子类建立工厂函数
+   *
+   * @return
+   */
+  static Person createMale() {
+    return new Male();
+  }
+
+  static Person createFemale() {
+    return new Female();
+  }
+}
+
+public class Male extends Person {
+
+  public Male() {
+    super(true, 'M');
+  }
+}
+
+public class Female extends Person {
+
+  public Female() {
+    super(false, 'F');
+  }
+}
+
+5,去掉父类中的abstract声明，去掉子类
+public class Person {
+
+  /**
+   * 针对每个常量在超类中声明一个对应字段
+   *
+   * @param isMale
+   * @param code
+   */
+  private final boolean isMale;
+
+  private final char code;
+
+  /**
+   * 为超类加一个个protected构建函数
+   *
+   * @param isMale
+   * @param code
+   */
+  protected Person(boolean isMale, char code) {
+    this.isMale = isMale;
+    this.code = code;
+  }
+
+  /**
+   * 在超类中加入常量函数
+   *
+   * @return
+   */
+  boolean isMale() {
+    return isMale;
+  }
+
+  char getCode() {
+    return code;
+  }
+
+  /**
+   * 首先为每个子类建立工厂函数
+   *
+   * @return
+   */
+  static Person createMale() {
+    return new Person(true, 'M');
+  }
+
+  static Person createFemale() {
+    return new Person(false, 'F');
+  }
+}

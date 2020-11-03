@@ -1,0 +1,34 @@
+重构的目录清单:
+1,重构入门示例
+
+函数的重构：
+在重构手法中，很大一部分是对函数进行整理，使之更恰当的包装代码。
+几乎所有时刻，问题都来源于过长的函数(long method)
+1,Extract Method(提练函数)
+2，Inline Method(内联函数）
+3,Inline Temp(内联临时变量)
+4,Replace Temp With Query(以查询取代临时变量)
+5,Introduce Explaining Variable (引用解释性变量）
+6,Split Temporary Variable (分解临时变量)
+7,remove Assignments to Parameters(移除对参数的赋值)
+8,Replace Method with Method Object(以函数对象取代函数)
+9,Subsitute Algorithm(替换算法）
+
+
+
+对象的重构：
+在对象的设计过程中，“决定把责任放在哪儿”即使不是最重要的事情，也是最重要的事件之一
+在对象的设计的过程中，谁都不能保证一开始就做对。
+在此情况下使用重构，可以改变自己原先的设计。
+类往往会因为承担过多责任而变得臃肿不堪。
+1，move Method(搬移函数）
+2，move field(搬移字段)
+3, extract Class(提练类)
+4, Inline Class(将类内联化)
+5，Hide Delegate(隐藏“委托”关系)
+6，Remove Middle Man(移除中间人)
+7，Introduce Foreign Method(引入外加函数)
+8，Introduce Local Extension(引入本地扩展)
+
+
+数据的重构：

@@ -1,0 +1,250 @@
+Change Value to Reference (将值对象改为引用对象)
+
+在一个类的衍生出许多彼此相等的实体，希望将它们替换为同一个对象
+
+在引用对象与值对象之间选择并不容量。有时会从一个简单的值对象开始。在其中保存少量不可修改的数据。
+而后你可能会希望给这个对象加入一些可以修改的数据，并且任何一个修改，都可以影响到所有引用此对象的地方。
+这时候就需要将这个对象变为引用对象。
+
+做法：
+1，使用Replace Constructor with Factory Method
+2,编译，测试
+3，决定由什么对象负责提供访问新对象的途径：
+可能是一个静态字段或者一个注册表对象。
+也可以使用多个对象作为新对象的访问点。
+4，决定这些引用对象应该预先创建好，或是应用动态创建。
+如果这些引用对象是预先创建好的，而你必须从内存中它们读取出来，那么就得确保它们在被需要的时候能够被及时加载。
+5，修改工厂函数，令它返回引用对象
+如果对象是预先创建好的，你就需要考虑：万一有人索求一个其实并不存在的对象，要如何处理错误？
+你可能希望对工厂函数使用Rename Method（273），使其传达这样的信息：它返回的是一个既存对象。
+6，编译，测试
+
+
+
+src:
+public class Order {
+
+  private String arg;
+
+  private Customer customer;
+
+  public Order(String customerName) {
+    this.customer = new Customer(customerName);
+  }
+
+  public String getArg() {
+    return arg;
+  }
+
+  public void setArg(String arg) {
+    this.arg = arg;
+  }
+
+  public String getCustomer() {
+    return this.customer.getCustomer();
+  }
+
+  public void setCustomer(String customerName) {
+    this.customer = new Customer(customerName);
+  }
+}
+
+public class Customer {
+
+  private final String customer;
+
+  public Customer(String customer) {
+    this.customer = customer;
+  }
+
+  public String getCustomer() {
+    return customer;
+  }
+}
+
+
+refactor:
+Customer
+1,定义工厂函数
+public class Customer {
+
+  private final String customer;
+
+  /**
+   * 工厂函数
+   * @param name
+   * @return
+   */
+  public static Customer create(String name) {
+    return new Customer(name);
+  }
+
+  public Customer(String customer) {
+    this.customer = customer;
+  }
+
+  public String getCustomer() {
+    return customer;
+  }
+}
+
+2:修改引用点
+public class Order {
+
+  private String arg;
+
+  private Customer customer;
+
+  public Order(String customerName) {
+    this.customer = Customer.create(customerName);
+  }
+
+  public String getArg() {
+    return arg;
+  }
+
+  public void setArg(String arg) {
+    this.arg = arg;
+  }
+
+  public String getCustomer() {
+    return this.customer.getCustomer();
+  }
+
+  public void setCustomer(String customerName) {
+    this.customer = new Customer(customerName);
+  }
+}
+
+3:再把构建函数声明为private
+public class Customer {
+
+  private final String name;
+
+  /**
+   * 工厂函数
+   * @param name
+   * @return
+   */
+  public static Customer create(String name) {
+    return new Customer(name);
+  }
+
+  private Customer(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+      return name;
+  }
+}
+
+4:决定如何访问Customer对象
+测试案例使用注册表的形式来保存对象，让Customer作为访问点
+public class Customer {
+
+  private static Map<String, Customer> DATA_INSTANCE = new HashMap<>(4);
+
+  private final String name;
+
+  static void loadCustomers() {
+    new Customer("Lemon Car Hire ").store();
+    new Customer("Associate Coffee Machines").store();
+    new Customer("Bilston Gasworks").store();
+  }
+
+  private void store() {
+    DATA_INSTANCE.put(this.getName(), this);
+  }
+
+  /**
+   * 工厂函数
+   *
+   * @param name
+   * @return
+   */
+  public static Customer create(String name) {
+    return new Customer(name);
+  }
+
+  private Customer(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+}
+
+//5,修改工厂函数，返回预先创建好的对象
+public class Customer {
+
+  private static Map<String, Customer> DATA_INSTANCE = new HashMap<>(4);
+
+  private final String name;
+
+  static void loadCustomers() {
+    new Customer("Lemon Car Hire ").store();
+    new Customer("Associate Coffee Machines").store();
+    new Customer("Bilston Gasworks").store();
+  }
+
+  private void store() {
+    DATA_INSTANCE.put(this.getName(), this);
+  }
+
+  /**
+   * 工厂函数
+   *
+   * @param name
+   * @return
+   */
+  public static Customer create(String name) {
+    return DATA_INSTANCE.get(name);
+  }
+
+  private Customer(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+}
+
+
+6,由于create()总是返回即有的Customer对象，应该使用Rename Method修改这个工厂函数名，以便强调这一点
+public class Customer {
+
+  private static Map<String, Customer> DATA_INSTANCE = new HashMap<>(4);
+
+  private final String name;
+
+  static void loadCustomers() {
+    new Customer("Lemon Car Hire ").store();
+    new Customer("Associate Coffee Machines").store();
+    new Customer("Bilston Gasworks").store();
+  }
+
+  private void store() {
+    DATA_INSTANCE.put(this.getName(), this);
+  }
+
+  /**
+   * 工厂函数
+   *
+   * @param name
+   * @return
+   */
+  public static Customer getNamed(String name) {
+    return DATA_INSTANCE.get(name);
+  }
+
+  private Customer(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+}

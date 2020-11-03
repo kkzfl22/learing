@@ -1,0 +1,318 @@
+Replace Type Code with State/Strategy (以state/strategy取代类型码)
+你有一个类型码，它会影响类的行为，但你无法通过继承手法消除它，以状态对象取代类型码
+
+本例与Replace Type code with subclass 很相似，但如果“类型码的值在生命周期内发生变化”或者“其他原因使用宿主类不能被继承”
+你可以使用本重构，本重构使用state模式或者Strategy模式，
+如果打算迁移状态相关的数据，而且把新建对象视为一种变迁状态，就应用使用state模式
+如果打算在完成本次重构后，再使用Replace Conditional with polymorphism简化一个简洁，就使用strategy模式模式比较适合。
+
+做法：
+1，使用self Encapsulate field 将类型码封装起来
+2，新建一个类，根据类类型码用途将它命名，这就是一个状态对象
+3，为这个类新建子类，每个子类对应一种类型
+4，在超类中建立一个抽象函数，用以返回类型码，在每个子类中覆写该函数，返回确切的类型码。
+5，编译
+6，在源类中建立一个字段，用以保存新建的状态对象
+7，调整源类中负责查询类型码的函数，将查询动作转发给状态对象
+8，调整源类中为类型码设值的函数，将一个恰当的状态对象子类赋值给“保存状态对象”的那个字段
+9，编译，测试
+
+
+src:
+public class Employee {
+
+  private int type;
+
+  static final int ENGINEER = 0;
+
+  static final int SALESMAN = 1;
+
+  static final int MANAGER = 2;
+
+  /** 岗位基本工资 */
+  private static final int MONTHLY_SALARY = 100;
+
+  /** */
+  private static final int COMMISSION = 30;
+
+  /** */
+  private static final int BONUS = 50;
+
+  Employee(int type) {
+    this.type = type;
+  }
+
+  int payAmount() {
+    switch (type) {
+      case ENGINEER:
+        return MONTHLY_SALARY;
+      case SALESMAN:
+        return MONTHLY_SALARY + COMMISSION;
+      case MANAGER:
+        return MONTHLY_SALARY + BONUS;
+      default:
+        throw new RuntimeException("Incorrect Employee");
+    }
+  }
+}
+
+
+refactor:
+1,封装类型码字段
+public class Employee {
+
+  private int type;
+
+  static final int ENGINEER = 0;
+
+  static final int SALESMAN = 1;
+
+  static final int MANAGER = 2;
+
+  /** 岗位基本工资 */
+  private static final int MONTHLY_SALARY = 100;
+
+  /** */
+  private static final int COMMISSION = 30;
+
+  /** */
+  private static final int BONUS = 50;
+
+  Employee(int type) {
+    this.setType(type);
+  }
+
+  int payAmount() {
+    switch (this.getType()) {
+      case ENGINEER:
+        return MONTHLY_SALARY;
+      case SALESMAN:
+        return MONTHLY_SALARY + COMMISSION;
+      case MANAGER:
+        return MONTHLY_SALARY + BONUS;
+      default:
+        throw new RuntimeException("Incorrect Employee");
+    }
+  }
+
+  /**
+   * 1，封装类型码字段
+   *
+   * @return
+   */
+  public int getType() {
+    return type;
+  }
+
+  public void setType(int type) {
+    this.type = type;
+  }
+}
+
+2，声明一个状态类型，将它声明为一个抽象类，并提供一个抽象函数，用于返回类型码。
+
+public abstract class EmployeeType {
+
+  /**
+   * 获取类型码
+   *
+   * @return 返回类型信息
+   */
+  abstract int getTypeCode();
+}
+
+3,创建子类
+public class Engineer extends EmployeeType {
+
+  @Override
+  int getTypeCode() {
+    return Employee.ENGINEER;
+  }
+}
+
+public class Saleman extends EmployeeType {
+
+  @Override
+  int getTypeCode() {
+    return Employee.SALESMAN;
+  }
+}
+
+public class Manager extends EmployeeType {
+
+  @Override
+  int getTypeCode() {
+    return Employee.MANAGER;
+  }
+}
+
+4,修改类型码的访问函数
+public class Employee {
+
+  private EmployeeType type;
+
+  static final int ENGINEER = 0;
+
+  static final int SALESMAN = 1;
+
+  static final int MANAGER = 2;
+
+  /** 岗位基本工资 */
+  private static final int MONTHLY_SALARY = 100;
+
+  /** */
+  private static final int COMMISSION = 30;
+
+  /** */
+  private static final int BONUS = 50;
+
+  Employee(int type) {
+    this.setType(type);
+  }
+
+  int payAmount() {
+    switch (this.getType()) {
+      case ENGINEER:
+        return MONTHLY_SALARY;
+      case SALESMAN:
+        return MONTHLY_SALARY + COMMISSION;
+      case MANAGER:
+        return MONTHLY_SALARY + BONUS;
+      default:
+        throw new RuntimeException("Incorrect Employee");
+    }
+  }
+
+  /**
+   * 1，封装类型码字段
+   *
+   * @return
+   */
+  public int getType() {
+    return type.getTypeCode();
+  }
+
+  public void setType(int typeArgs) {
+    switch (typeArgs) {
+      case ENGINEER:
+        type = new Engineer();
+        break;
+      case SALESMAN:
+        type = new Saleman();
+        break;
+      case MANAGER:
+        type = new Manager();
+        break;
+      default:
+        throw new IllegalArgumentException("Incorrect Employee code");
+    }
+  }
+}
+
+5,将类型码的定义搬移动Employee类型中，
+在抽象类中建立一个工厂函数以生成适当的employeeType对象，并调用Employee中为类型码赋值
+
+public abstract class EmployeeType {
+
+  /**
+   * 获取类型码
+   *
+   * @return 返回类型信息
+   */
+  abstract int getTypeCode();
+
+  static final int ENGINEER = 0;
+
+  static final int SALESMAN = 1;
+
+  static final int MANAGER = 2;
+
+  public static EmployeeType newType(int typeArgs) {
+    switch (typeArgs) {
+      case ENGINEER:
+        return new Engineer();
+      case SALESMAN:
+        return new Saleman();
+      case MANAGER:
+        return new Manager();
+      default:
+        throw new IllegalArgumentException("Incorrect Employee code");
+    }
+  }
+}
+
+
+public class Employee {
+
+  private EmployeeType type;
+
+  /** 岗位基本工资 */
+  private static final int MONTHLY_SALARY = 100;
+
+  /** */
+  private static final int COMMISSION = 30;
+
+  /** */
+  private static final int BONUS = 50;
+
+  Employee(int type) {
+    this.setType(type);
+  }
+
+  int payAmount() {
+    switch (this.getType()) {
+      case EmployeeType.ENGINEER:
+        return MONTHLY_SALARY;
+      case EmployeeType.SALESMAN:
+        return MONTHLY_SALARY + COMMISSION;
+      case EmployeeType.MANAGER:
+        return MONTHLY_SALARY + BONUS;
+      default:
+        throw new RuntimeException("Incorrect Employee");
+    }
+  }
+
+  /**
+   * 1，封装类型码字段
+   *
+   * @return
+   */
+  public int getType() {
+    return type.getTypeCode();
+  }
+
+  public void setType(int typeArgs) {
+    type = EmployeeType.newType(typeArgs);
+  }
+}
+
+6，修改外部引用
+public class Engineer extends EmployeeType {
+
+  @Override
+  int getTypeCode() {
+    return EmployeeType.ENGINEER;
+  }
+}
+
+public class Manager extends EmployeeType {
+
+  @Override
+  int getTypeCode() {
+    return EmployeeType.MANAGER;
+  }
+}
+
+public class Saleman extends EmployeeType {
+
+  @Override
+  int getTypeCode() {
+    return EmployeeType.SALESMAN;
+  }
+}
+
+7，编译，测试
+
+
+
+

@@ -1,0 +1,30 @@
+Encapsulate Field(封装字段）
+
+在代码的类中存在一个public字段。
+将它声明为private,并提供相应的访问函数
+
+
+
+原因：
+
+面向对象的首要原则就是封装，或者“数据隐藏”。 按此原则，你绝对不应该将数据声明为public,
+否则其他对象就有可能访问甚至修改这荐数据，而拥有该 数据的对象却毫无察觉。
+于是数据和行为就被分开了---这可不是一件好事。
+
+数据声明为public是被看做一种不好的做法，因为这样会降低程序的模块化程序 。
+
+
+原始
+public String name;
+
+refactor:
+private String name;
+
+public String getName()
+{
+    return name;
+}
+public void setName(String arg)
+{
+    this.name = arg;
+}

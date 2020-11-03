@@ -1,0 +1,111 @@
+Remove Middle Man(移除中间人)
+某个类做了过多的简单委托动作。让客户直接调用委托类。
+
+动机：
+在“封装受拖对象”与“移除中间人”之间，很难说什么程度的隐藏才是合适的，
+有了Hide Delegate与Remove Middle Man，可不必操心这个问题
+可以随着系统的运行过程中不断进行调整。随着系统的变化。
+这个合适的程序，在6个月之前可能是合适的，但现在完全变了。
+
+重构意义在于：你永远不必说对不起，把出问题的地方修补好就行。
+
+做法：
+1，建立一个函数，用于获得受委托对象。
+2，对于每个委托函数，在服务类中删除该函数。并让需要调用该函数的客户转为调用受托对象。
+3，处理每个委托函数后，编译、测试。
+
+
+重构前:
+public class Person {
+
+  /** 部门信息 */
+  private Department department;
+
+  public void setDepartment(Department department) {
+    this.department = department;
+  }
+
+  /**
+   * 通过此函数便可隐藏调用关系。
+   * @return
+   */
+  public Person getManager() {
+    return department.getManager();
+  }
+}
+public class Department {
+
+  private String chargeCode;
+
+  private Person manager;
+
+  public Department(Person manager) {
+    this.manager = manager;
+  }
+
+  public String getChargeCode() {
+    return chargeCode;
+  }
+
+  public Person getManager() {
+    return manager;
+  }
+
+  public void setChargeCode(String chargeCode) {
+    this.chargeCode = chargeCode;
+  }
+}
+
+
+重构后:
+1：建立一个函数用于获得受托对象。
+public class Person {
+
+  /** 部门信息 */
+  private Department department;
+
+  public void setDepartment(Department department) {
+    this.department = department;
+  }
+
+
+  /**
+   * 建立一个函数用于获得受托对象
+   * @return
+   */
+  public Department getDepartment() {
+    return department;
+  }
+
+  /**
+   * 通过此函数便可隐藏调用关系。
+   * @return
+   */
+  public Person getManager() {
+    return department.getManager();
+  }
+}
+
+
+2,可以将调用函数进行修改，
+ person.getManager().getManager()
+
+ 3，删除代理
+public class Person {
+
+  /** 部门信息 */
+  private Department department;
+
+  public void setDepartment(Department department) {
+    this.department = department;
+  }
+
+  /**
+   * 建立一个函数用于获得受托对象
+   *
+   * @return
+   */
+  public Department getDepartment() {
+    return department;
+  }
+}

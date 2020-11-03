@@ -1,0 +1,93 @@
+Hide Delegate(隐藏“委托”关系)
+客户通过一个委托类来调用另一个对象，
+在服务类上建立客户所需的所有函数，用以隐藏委托关系。
+
+封装即使不是对象的最关键特征，也是最关键特征之一。封装意味着每个对象应该尽可能少了解系统的其他部分。
+如此一来，一旦发生了某些变化。需要了解变化的对象就会比较少，这会使变化比较容易的进行。
+
+做法：
+1，对于每一个委托关系中的函数，在服务对象端建立一个简单的委托函数。
+2，调整客户，令它只调用服务对象提供的函数。
+3，每次调整后，编译并测试。
+4，如果 将来不再有任何客户需要取用Delegate（委托类），便可移除服务对象中的相关访问函数。
+5，编译，测试。
+
+重构前:
+public class Department {
+
+  private String chargeCode;
+
+  private Person manager;
+
+  public Department(Person manager) {
+    this.manager = manager;
+  }
+
+  public String getChargeCode() {
+    return chargeCode;
+  }
+
+  public Person getManager() {
+    return manager;
+  }
+
+  public void setChargeCode(String chargeCode) {
+    this.chargeCode = chargeCode;
+  }
+}
+public class Person {
+
+  /** 部门信息 */
+  private Department department;
+
+  public Department getDepartment() {
+    return department;
+  }
+
+  public void setDepartment(Department department) {
+    this.department = department;
+  }
+}
+
+重构后:
+public class Department {
+
+  private String chargeCode;
+
+  private Person manager;
+
+  public Department(Person manager) {
+    this.manager = manager;
+  }
+
+  public String getChargeCode() {
+    return chargeCode;
+  }
+
+  public Person getManager() {
+    return manager;
+  }
+
+  public void setChargeCode(String chargeCode) {
+    this.chargeCode = chargeCode;
+  }
+}
+public class Person {
+
+  /** 部门信息 */
+  private Department department;
+
+  public void setDepartment(Department department) {
+    this.department = department;
+  }
+
+  /**
+   * 通过此函数便可隐藏调用关系。
+   * @return
+   */
+  public Person getManager() {
+    return department.getManager();
+  }
+}
+
+2,编译测试。

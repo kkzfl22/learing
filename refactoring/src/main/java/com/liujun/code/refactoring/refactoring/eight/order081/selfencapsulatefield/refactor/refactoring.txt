@@ -1,0 +1,106 @@
+重构8.1
+self Encapsulate Field(自封装)
+
+在自段访问的方式上，存在两种的方案：
+1: 在类中，所有的访问都通过直接访问的式。
+2，不论在类中，还是类外，都通过间接访问的方式。
+
+直接访问优势：代码比较容易阅读
+间接访问的优势： 子类可以通过覆写一个函数从而改变数据获取的途径；还可以支持更灵活的数据管理方式。
+
+
+有重构这两种手段存在，可以在两程策略之间灵活的切换。
+比如刚开始都使用直接访问的方式。当这种方式带来了问题，切换为间接方式，重构为这个提供了自由度。
+
+典型的一个场景：
+子类想访问父类的一个字段，在子类中想将这个变量的访问改为一个计算后的值。这就可以使用self Encapsulate Field(自封装)
+
+做法：
+1，为封装的字段，建立取值函数
+2，找到所有的引用点。将它们全部改为调用取值/设值函数
+3，将封装的字段改为private
+4, 复查，确保找到了所有引用点。
+5，编译、测试。
+
+
+src:
+public class IntRange {
+
+    private int low, high;
+
+
+    boolean includes(int arg) {
+        return arg >= low && arg <= high;
+    }
+
+    void grow(int factor) {
+        high = high * factor;
+    }
+
+    IntRange(int low, int high) {
+        this.low = low;
+        this.high = high;
+    }
+}
+
+refactor:
+public class IntRange {
+
+    private int low, high;
+
+    boolean includes(int arg) {
+        return arg >= getLow() && arg <= getHigh();
+    }
+
+    void grow(int factor) {
+        setHigh(getHigh() * factor);
+    }
+
+    IntRange(int low, int high) {
+        this.initialize(low, high);
+    }
+
+    private void initialize(int low, int high) {
+        this.low = low;
+        this.high = high;
+    }
+
+    public int getLow() {
+        return low;
+    }
+
+    public void setLow(int low) {
+        this.low = low;
+    }
+
+    public int getHigh() {
+        return high;
+    }
+
+    public void setHigh(int high) {
+        this.high = high;
+    }
+}
+
+
+当需要扩展时，可直接覆盖
+public class CappedRange extends IntRange {
+
+
+    public CappedRange(int low, int high, int cap) {
+        super(low, high);
+        this.cap = cap;
+    }
+
+    private int cap;
+
+    public int getCap() {
+        return cap;
+    }
+
+
+    @Override
+    public int getHigh() {
+        return Math.min(super.getHigh(), getCap());
+    }
+}

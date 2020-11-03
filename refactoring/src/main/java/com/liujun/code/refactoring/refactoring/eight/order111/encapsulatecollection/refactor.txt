@@ -1,0 +1,121 @@
+Encapsulate Collection(封装集合)
+
+有个函数返回集合。
+让这个函数返回集合的一个只读副本，并在这个类中提供添加/移除集合元素的函数。
+
+原因：
+在使用集合(collection,或者是Array,list或者set，或者map)来保存一组实例，这样的类通常会提供针对该集合的取值/设值函数。
+但是集合的处理方式应用和其他类型的数据略有不同，取值函数不应该返回集合自身。
+因为这样会让用户得以修改集合内容而集合的拥有者却一元所知，这会对用户暴露过多对象内部数据结构的信息。
+如果一个取值函数确实需要返回多个值，它应该避免用户直接操作对象内所保存的集合，并隐藏对象内与用户无关的数据结构。
+
+以个人与课程为例
+src:
+public class Course {
+
+  private String name;
+
+  private boolean isAdvanced;
+
+  public Course(String name, boolean isAdvanced) {
+    this.name = name;
+    this.isAdvanced = isAdvanced;
+  }
+}
+
+class Person {
+
+  private Set<Course> courses;
+
+  public Set<Course> getCourse() {
+    return courses;
+  }
+
+  public void setCourses(Set<Course> courses) {
+    this.courses = courses;
+  }
+}
+
+
+
+refactor:
+重构第一步，建立合适的取值/设置函数
+/**
+ * 个人与课程
+ *
+ * @author liujun
+ * @version 0.0.1
+ */
+public class Course {
+
+  private String name;
+
+  private boolean isAdvanced;
+
+  public Course(String name, boolean isAdvanced) {
+    this.name = name;
+    this.isAdvanced = isAdvanced;
+  }
+}
+
+class Person {
+
+  /** 重构第一步，建立合适的取值，设值函数
+   * 如果厚在需以以其他方式来初始化集合的，需要做初始化操作
+   * */
+  private final Set<Course> courses;
+
+  public Person(Set<Course> courses) {
+    this.courses = courses;
+  }
+
+  public void addCourse(Course itemInfo) {
+    courses.add(itemInfo);
+  }
+
+  public void removeCourse(Course itemInfo) {
+    courses.remove(itemInfo);
+  }
+}
+
+针对需要返回集合所有元素的场景，仅返回只读副本
+public class Course {
+
+  private String name;
+
+  private boolean isAdvanced;
+
+  public Course(String name, boolean isAdvanced) {
+    this.name = name;
+    this.isAdvanced = isAdvanced;
+  }
+}
+
+class Person {
+
+  /** 重构第一步，建立合适的取值，设值函数 如果厚在需以以其他方式来初始化集合的，需要做初始化操作 */
+  private final Set<Course> courses;
+
+  public Person(Set<Course> courses) {
+    this.courses = courses;
+  }
+
+  public void addCourse(Course itemInfo) {
+    courses.add(itemInfo);
+  }
+
+  public void removeCourse(Course itemInfo) {
+    courses.remove(itemInfo);
+  }
+
+  /**
+   * 如果需要返回集合的中所有元素信息.
+   *
+   * <p>可以让取值函数只返回一个只读的副本，用以确保没有任何一个用户能够通过取值函数修改集合。
+   *
+   * @return
+   */
+  public Set<Course> getCourses() {
+    return Collections.unmodifiableSet(courses);
+  }
+}

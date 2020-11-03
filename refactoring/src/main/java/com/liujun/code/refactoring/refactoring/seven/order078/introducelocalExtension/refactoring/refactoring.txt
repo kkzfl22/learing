@@ -1,0 +1,57 @@
+Introduce Local Extension(引入本地扩展)
+
+你需为服务类提供一此额外的函数，但你无法修改这个类。
+建立一个新类。使它包含这些额外的函数。让这个扩展成为源类的子类或者包装类。
+
+
+动机：
+类的作者无法预知未来。他常常没有能为你准备一些有用的函数。
+如果可以修改源码，最好的就可以直接修改源码
+如果只需要一两个，可以使用Introduce Foreign Method(外加函数），如果需要的额外函数超过2个，外加函数很难控制他们。
+所以需要些这些函数组织在一起，放到一个恰当的地方。
+两种标准对象技术。子类化（subclassing）和包装(wrapping)是显而易见的办法。
+把子或者包装类统称为本地扩展。
+
+使用本地扩展使得以坚持“函数和数据应该被统一封装”的原则。如果你一直把本该放在扩展类中的代码零散的放置于其他类中。
+最终只会高其他这些类变得过分复杂。并使得其中函数难以被复用。
+
+子类与包装类做选择时，通常建议首先子类，
+因为这样的工作量比较少。
+制作子类的最大障碍在于，它必须在对象创建期实施。如果可以接管对象的创建，那当然没有问题
+如果想在对象创建之后再使用本地扩展。那就有问题了。
+
+一般来说，不建议在扩展类中覆写原始类的函数，只会添加新函数。
+使用包装类时，用户必须使用包装类来进行操作。
+
+
+以java中的时间对象为例，
+1.需要计算明天的时间。
+
+子类化
+public class DateSub extends Date {
+
+    public DateSub(long time) {
+        super(time);
+    }
+
+    public Date nextDay() {
+        return new Date(getYear(), getMonth(), getDate() + 1);
+    }
+
+}
+
+包装类
+public class DateWrap {
+
+    private Date date;
+
+    public DateWrap(long time) {
+        this.date = new Date(time);
+    }
+
+    public Date nextDay() {
+        return new Date(date.getYear(), date.getMonth(), date.getDay() + 1);
+    }
+}
+
+

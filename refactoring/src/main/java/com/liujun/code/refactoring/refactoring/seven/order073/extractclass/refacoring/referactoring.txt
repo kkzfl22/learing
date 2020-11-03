@@ -1,0 +1,174 @@
+extract Class(提练类)
+如果某个类做应该由两个类做的事，
+那么就建立一个新类，将相应的字段和函数从旧类搬移动新类。
+
+一个类，应该是一个清楚的抽象。
+
+
+做法：
+1，决定如何分解类所负的责任。
+2，建立一个新类，用于表现从旧类中分离出来的责任。
+3，建立从旧类到新类的连接关系。
+4，对于想搬移的每一个字段，使用move Field进行搬移。
+5，使用move Method将必要的函数搬移动新类，先搬移较低层函数（也就是被其他函数调用多于调用其他函数者）再搬移较高层函数。
+6，每次搬移之后，编译，测试
+7，检查、精简每个类的接口。
+8，决定是否公开新类，如果的确实需要公开它，就要决定 它成为引用对象，还是不可变值对象。
+
+
+重构前:
+public class Person {
+
+  private String name;
+
+  private String officeAreaCode;
+
+  private String officeNumber;
+
+  public Person(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getTelephoneNumber() {
+    return "(" + officeAreaCode + ")" + officeNumber;
+  }
+
+  public String getOfficeAreaCode() {
+    return officeAreaCode;
+  }
+
+  public void setOfficeAreaCode(String officeAreaCode) {
+    this.officeAreaCode = officeAreaCode;
+  }
+
+  public String getOfficeNumber() {
+    return officeNumber;
+  }
+
+  public void setOfficeNumber(String officeNumber) {
+    this.officeNumber = officeNumber;
+  }
+}
+
+
+
+重构：
+此示例中，将电话号码相关行为分离到独立类中。
+1,新建一个电话号码的类
+public class TelephoneNumber {}
+
+2,建立Person到TelephoneNumber的联系。
+public class Person {
+....
+  /** 电话号码 */
+  private TelephoneNumber telephoneNumber = new TelephoneNumber();
+  ....
+}
+
+3,运用move Field搬移字段.
+Getter
+@Setter
+@ToString
+public class TelephoneNumber {
+
+  private String officeAreaCode;
+
+  private String officeNumber;
+}
+
+public class Person {
+
+  /** 名称 */
+  private String name;
+
+  /** 电话号码 */
+  private TelephoneNumber telephoneNumber = new TelephoneNumber();
+
+  public Person(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getTelephoneNumber() {
+    return "(" + getOfficeAreaCode() + ")" + getOfficeNumber();
+  }
+
+  public String getOfficeAreaCode() {
+    return telephoneNumber.getOfficeAreaCode();
+  }
+
+  public void setOfficeAreaCode(String officeAreaCode) {
+    telephoneNumber.setOfficeAreaCode(officeAreaCode);
+  }
+
+  public String getOfficeNumber() {
+    return telephoneNumber.getOfficeNumber();
+  }
+
+  public void setOfficeNumber(String officeNumber) {
+    this.setOfficeNumber(officeNumber);
+  }
+}
+
+
+4,再运用move Method将相关函数移动到telephoneNumber类中
+public class TelephoneNumber {
+
+  private String officeAreaCode;
+
+  private String officeNumber;
+
+  public String getTelephoneNumber() {
+    return "(" + getOfficeAreaCode() + ")" + getOfficeNumber();
+  }
+
+
+  public String getOfficeAreaCode() {
+    return officeAreaCode;
+  }
+
+  public void setOfficeAreaCode(String officeAreaCode) {
+    this.officeAreaCode = officeAreaCode;
+  }
+
+  public String getOfficeNumber() {
+    return officeNumber;
+  }
+
+  public void setOfficeNumber(String officeNumber) {
+    this.officeNumber = officeNumber;
+  }
+}
+public class Person {
+
+  /** 名称 */
+  private String name;
+
+  /** 电话号码 */
+  private TelephoneNumber telephoneNumber = new TelephoneNumber();
+
+  public Person(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getTelephoneNumber() {
+    return "(" + telephoneNumber.getOfficeAreaCode() + ")" + telephoneNumber.getOfficeNumber();
+  }
+
+  /** @return */
+  public TelephoneNumber getOfficeTelephone() {
+    return telephoneNumber;
+  }
+}
+

@@ -1,0 +1,2 @@
+Change Bidirectional Association to Unidirectional(将双向关联改为单向关联)
+两个类之间存在双向关联，但其中一个类如今不再需要另一个类的特性，去除不必要的关联。

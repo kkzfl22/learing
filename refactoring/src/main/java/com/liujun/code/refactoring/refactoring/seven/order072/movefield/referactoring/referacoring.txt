@@ -1,0 +1,77 @@
+move field(搬移字段)
+
+如果某个字段被其所驻类之外的别一个类更多地用到。
+那么就应该将在目标类中新建一个字段，修改源字段的所有所用，令他们改用新字段。
+
+在类之前搬移状态和行为，是重构过程中必不可少的措施。
+
+
+做法：
+1，如果字段的访问是public,使用Encapsulate Field将它封装起来。
+2，编译
+3，在目标类中建立与源字段相同的字段，并建立相应的设值/取值函数
+4，编译目标类。
+5，决定在如何在源对象中引用目标对象。
+6，删除源字段。
+7，将所有对源字段的引用替换为对这个目标函数的调用。
+
+
+源:
+public class Account {
+
+  private final AccountType type;
+
+  /** 利率计算 */
+  private  double interestRate;
+
+  public Account(AccountType type, double interestRate) {
+    this.type = type;
+    this.interestRate = interestRate;
+  }
+
+  /**
+   * 利率计算
+   *
+   * @param amount
+   * @param days
+   * @return
+   */
+  double interestForAmountDays(double amount, int days) {
+    return interestRate * amount * days / 365;
+  }
+}
+
+重构：
+将利率的字段搬移到类型中
+1,在类型中建立对应的字段。
+@Setter
+@Getter
+@ToString
+public class AccountType {
+
+  /** 利率计算 */
+  private double interestRate;
+}
+
+2，对源类中的引用进行修改。
+public class Account {
+
+  private final AccountType type;
+
+  public Account(AccountType type) {
+    this.type = type;
+  }
+
+  /**
+   * 利率计算
+   *
+   * @param amount
+   * @param days
+   * @return
+   */
+  double interestForAmountDays(double amount, int days) {
+    return type.getInterestRate() * amount * days / 365;
+  }
+}
+
+3，测试
