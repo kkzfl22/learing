@@ -1,0 +1,87 @@
+Decompose Conditional （分解条件表达式）
+
+当有一个复杂的条件 (if-then-else) 语句，从if、then、else三个段落中分别提练出独立函数
+
+
+动机：
+程序之中，复杂的条件逻辑是最常导致复杂度上升的地点之一，必须编写不同的条件分支，根据不同的分支做不同的事情，
+然后很得就会得到一个相当长的函数。大函数自身的就会使得代码的可读性下降，而条件逻辑则会使代码更难以阅读。
+
+
+
+
+
+做法：
+1，将if段落提练出来，构成一个独立函数
+2，将then段落和else段落都提练出来，各自构成一个独立函数。
+
+src:
+public class DataCount {
+
+  private double quantity;
+
+  private double winterRate;
+
+  private double summerRate;
+
+  private double winterServiceCharge;
+
+  private static final int SUMMER_START = 6;
+
+  private static final int SUMMER_END = 9;
+
+  public double dataCount(int season, Date currData) {
+    double charge;
+
+    if (season < SUMMER_START || season > SUMMER_END) {
+      charge = quantity * winterRate * winterServiceCharge;
+    } else {
+      charge = quantity * summerRate;
+    }
+
+    return charge;
+  }
+}
+
+refactor:
+通过将各种表达式抽取到函数中，就解决了复杂的逻辑分支。
+public class DataCount {
+
+  private double quantity;
+
+  private double winterRate;
+
+  private double summerRate;
+
+  private double winterServiceCharge;
+
+  private static final int SUMMER_START = 6;
+
+  private static final int SUMMER_END = 9;
+
+  public double dataCount(int month) {
+    double charge;
+
+    if (this.notSummer(month)) {
+      charge = this.winterCharge();
+    } else {
+      charge = this.summerCharge();
+    }
+
+    return charge;
+  }
+
+  private boolean notSummer(int month) {
+    return month < SUMMER_START || month > SUMMER_END;
+  }
+
+  private double summerCharge() {
+    return quantity * winterRate * winterServiceCharge;
+  }
+
+  private double winterCharge() {
+    return quantity * summerRate;
+  }
+}
+
+有时分支条件很短，似乎看上去没有必要，尽管这些代码很短，但在代码意图与代码自身之间存在不小的差距。

@@ -1,0 +1,264 @@
+Remove Control Flag (移除控制标记)
+
+在一系列布尔表达式中，某个变量带有“控制标识”(control flag)作用
+以break语句或者return语句取代控制标记。
+
+原因：
+在条件表达式中，常常看到以判断何时停止条件检查的控制标记
+set done to false
+while not done
+    if (condition)
+        do something
+        set done to true
+    next step of loop
+这样的控制标识所带来的麻烦超过了它所带的便利，归根到底的原因“每个程序只能一个入口和一个出口”，
+但是单一出口原则会让你的代码中加入讨厌的控制标记，大大降低条件表达式的可读性，这就是编程语言提供break和continue语句的原因
+用它们跳出复杂的条件语句。去掉控制标识所产生的效果非常的好，条件语句真正的用途会清晰得多。
+
+
+做法:
+方案1:
+对控制标识的处理，最显而易见的办法就是使用java提供的break语句或continue语句。
+找出让你跳出这段逻辑的控制标记值。
+找出对标识变量赋值的语句，代以恰当的break语句或者continue语句
+每次替换后，编译测试。
+
+方案2：
+在未能提供break和continue语句的编程语言中，可以使用下述办法
+运用extract Method,将整段逻辑提练到一个独立函数中
+找出让你跳出这段逻辑的控制标识值。
+找出对标识变量赋值的语句，代以恰当的return语句。
+每次替换后，编译并测试。
+
+
+
+以break方案
+src:
+public class BreakCount {
+
+  public void checkSecurity(String[] people) {
+    boolean found = false;
+
+    for (int i = 0; i < people.length; i++) {
+      if (!found) {
+        if (people[i].equals("Don")) {
+          sendAlert();
+          found = true;
+        }
+        if (people[i].equals("John")) {
+          sendAlert();
+          found = true;
+        }
+      }
+    }
+  }
+
+  private void sendAlert() {
+    System.out.println("alert");
+  }
+}
+
+refactor:
+1,使用break语句替换掉对变量的赋值
+public class BreakCount {
+
+  public void checkSecurity(String[] people) {
+    boolean found = false;
+
+    for (int i = 0; i < people.length; i++) {
+      if (!found) {
+        if (people[i].equals("Don")) {
+          sendAlert();
+          //使用break语句替换掉对变量的赋值
+          break;
+        }
+        if (people[i].equals("John")) {
+          sendAlert();
+            break;
+        }
+      }
+    }
+  }
+
+  private void sendAlert() {
+    System.out.println("alert");
+  }
+}
+
+2,去掉所有对控制标识的引用
+public class BreakCount {
+
+  public void checkSecurity(String[] people) {
+
+    for (int i = 0; i < people.length; i++) {
+
+      if (people[i].equals("Don")) {
+        sendAlert();
+        // 使用break语句替换掉对变量的赋值
+        break;
+      }
+      if (people[i].equals("John")) {
+        sendAlert();
+        break;
+      }
+    }
+  }
+
+  private void sendAlert() {
+    System.out.println("alert");
+  }
+}
+
+
+使用return语句
+src:
+public class ReturnCount {
+
+  public void checkSecurity(String[] people) {
+    String found = "";
+
+    for (int i = 0; i < people.length; i++) {
+      if ("".equals(found)) {
+        if (people[i].equals("Don")) {
+          sendAlert();
+          found = "Don";
+        }
+        if (people[i].equals("John")) {
+          sendAlert();
+          found = "John";
+        }
+      }
+    }
+
+    someLaterCode(found);
+  }
+
+  private void sendAlert() {
+    System.out.println("alert");
+  }
+
+  private void someLaterCode(String found) {
+    System.out.println("data : " + found);
+  }
+}
+
+refactor:
+1,将foundMiscreant提练到单独的函数中
+public class ReturnCount {
+
+  public void checkSecurity(String[] people) {
+    String found = foundMiscreant(people);
+
+    someLaterCode(found);
+  }
+
+  /**
+   * 对方法执行重构，提供出查找的相关的方法
+   *
+   * @param people
+   * @return
+   */
+  private String foundMiscreant(String[] people) {
+    String found = "";
+    for (int i = 0; i < people.length; i++) {
+      if ("".equals(found)) {
+        if (people[i].equals("Don")) {
+          sendAlert();
+          found = "Don";
+        }
+        if (people[i].equals("John")) {
+          sendAlert();
+          found = "John";
+        }
+      }
+    }
+    return found;
+  }
+
+  private void sendAlert() {
+    System.out.println("alert");
+  }
+
+  private void someLaterCode(String found) {
+    System.out.println("data : " + found);
+  }
+}
+
+2,加入return语句
+public class ReturnCount {
+
+  public void checkSecurity(String[] people) {
+    String found = foundMiscreant(people);
+
+    someLaterCode(found);
+  }
+
+  /**
+   * 对方法执行重构，提供出查找的相关的方法
+   *
+   * @param people
+   * @return
+   */
+  private String foundMiscreant(String[] people) {
+    String found = "";
+    for (int i = 0; i < people.length; i++) {
+      if ("".equals(found)) {
+        if (people[i].equals("Don")) {
+          sendAlert();
+          return  "Don";
+        }
+        if (people[i].equals("John")) {
+          sendAlert();
+          return "John";
+        }
+      }
+    }
+    return found;
+  }
+
+  private void sendAlert() {
+    System.out.println("alert");
+  }
+
+  private void someLaterCode(String found) {
+    System.out.println("data : " + found);
+  }
+}
+
+3,去掉标识:
+public class ReturnCount {
+
+  public void checkSecurity(String[] people) {
+    String found = foundMiscreant(people);
+    someLaterCode(found);
+  }
+
+  /**
+   * 对方法执行重构，提供出查找的相关的方法
+   *
+   * @param people
+   * @return
+   */
+  private String foundMiscreant(String[] people) {
+
+    for (int i = 0; i < people.length; i++) {
+      if (people[i].equals("Don")) {
+        sendAlert();
+        return "Don";
+      }
+      if (people[i].equals("John")) {
+        sendAlert();
+        return "John";
+      }
+    }
+    return "";
+  }
+
+  private void sendAlert() {
+    System.out.println("alert");
+  }
+
+  private void someLaterCode(String found) {
+    System.out.println("data : " + found);
+  }
+}

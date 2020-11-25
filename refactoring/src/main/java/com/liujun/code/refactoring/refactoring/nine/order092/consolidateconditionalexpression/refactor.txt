@@ -1,0 +1,117 @@
+Consolidate Conditional Expression (合并条件表达式)
+
+当存在一系列条件测试，都得到相同结果。
+将这些测试合并为一个条件表达式，并将这个条件表达式提练成为一个独立函数。
+
+原因：
+在代码中，有时会发现一串条件检查，检查的条件各不相同，最终行为却一致。
+如果发现这种情况，应该使用“逻辑或”和“逻辑与”将它们合并为一个条件表达式
+
+合并代码的原因有2点：
+1，合并后的条件代码会告诉你，“实际上只有一次条件检查，只不过有多个并列条件而已”从而使这一点更加清晰。
+2，将检查条件提练成一个独立函数对于厘清代码意义非常有用，因为它把描述“做什么”的语句换成了“为什么这么做”
+
+对于有些是情况是不能合并的：
+如果认为这些检查彼此独立，不应该被视为同一次检查，那就不要使用本项重构
+
+做法：
+1，确定这些条件语句都没有副作用。
+2，使用适当的逻辑操作符。将一系列的条件合并的为一个
+3，编译，测试
+4，对合并后的条件表达式，使用Extract Method
+
+逻辑或
+src:
+ private final int condition1 = 0;
+
+  private final int condition2 = 1;
+
+  private final int condition3 = 2;
+
+  public int dataCount() {
+    if (condition1 > 0) {
+      return 0;
+    }
+    if (condition2 > 1) {
+      return 0;
+    }
+
+    if (condition3 > 0) {
+      return 0;
+    }
+    System.out.println(".........");
+    return -1;
+  }
+
+
+refactor:
+public class DataCount {
+
+  private final int condition1 = 0;
+
+  private final int condition2 = 1;
+
+  private final int condition3 = 2;
+
+  public int dataCount() {
+    if (dataCheck()) {
+      return 0;
+    }
+
+    System.out.println(".........");
+    return -1;
+  }
+
+  private boolean dataCheck() {
+    return condition1 > 0 || condition2 > 1 || condition3 > 0;
+  }
+}
+
+
+逻辑与:
+src:
+public class DataAndCount {
+
+  private final int condition1 = 0;
+
+  private final int condition2 = 1;
+
+  private final int condition3 = 2;
+
+  public int dataCount() {
+    if (condition1 > 0) {
+      if (condition2 > 1) {
+        if (condition3 > 0) {
+          return 0;
+        }
+      }
+    }
+
+    System.out.println(".........");
+    return -1;
+  }
+}
+
+
+refactor:
+public class DataAndCount {
+
+  private final int condition1 = 0;
+
+  private final int condition2 = 1;
+
+  private final int condition3 = 2;
+
+  public int dataCount() {
+    if (checkData()) {
+      return 0;
+    }
+
+    System.out.println(".........");
+    return -1;
+  }
+
+  private boolean checkData() {
+    return condition1 > 0 && condition2 > 1 && condition3 > 0;
+  }
+}
