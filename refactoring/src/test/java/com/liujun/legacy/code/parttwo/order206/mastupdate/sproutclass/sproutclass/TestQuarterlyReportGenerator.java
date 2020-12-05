@@ -1,7 +1,7 @@
 package com.liujun.legacy.code.parttwo.order206.mastupdate.sproutclass.sproutclass;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 /**
  * 单元测试
@@ -18,6 +18,6 @@ public class TestQuarterlyReportGenerator {
     QuarterlyReportGenerator instance = new QuarterlyReportGenerator(header);
     String result = instance.generate();
     System.out.println(result);
-    Assert.assertNotNull(result);
+    assertNotNull(result);
   }
 }

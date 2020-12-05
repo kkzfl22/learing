@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.sex.order066.splittemporaryvariable.referactoring;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * 测试临时变量分析的原代码
@@ -15,6 +16,6 @@ public class DataCountTest {
   public void testGetDistanceTravelled() {
     DataCount instance = new DataCount();
     double value = instance.getDistanceTravelled(20);
-    Assert.assertEquals(200020.0, value, 0.0);
+    assertEquals(200020.0, value, 0.0);
   }
 }

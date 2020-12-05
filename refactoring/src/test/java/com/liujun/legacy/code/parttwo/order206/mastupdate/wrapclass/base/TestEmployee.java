@@ -1,7 +1,8 @@
 package com.liujun.legacy.code.parttwo.order206.mastupdate.wrapclass.base;
 
 import com.liujun.legacy.code.parttwo.order206.mastupdate.wrapclass.common.PayDispatcher;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author liujun

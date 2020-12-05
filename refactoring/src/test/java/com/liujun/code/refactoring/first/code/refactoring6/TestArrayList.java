@@ -1,6 +1,8 @@
 package com.liujun.code.refactoring.first.code.refactoring6;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;

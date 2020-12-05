@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.sex.order068.replacemethodwithmethodobject.src;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * @author liujun
@@ -18,6 +19,6 @@ public class AccountTest {
     Account instance = new Account();
     int rsp = instance.gama(inputVal, quantity, yearToDate);
     System.out.println(rsp);
-    Assert.assertEquals(296700, rsp);
+    assertEquals(296700, rsp);
   }
 }

@@ -1,6 +1,6 @@
 package com.liujun.code.refactoring.refactoring.seven.order076.removemiddleman.src;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author liujun

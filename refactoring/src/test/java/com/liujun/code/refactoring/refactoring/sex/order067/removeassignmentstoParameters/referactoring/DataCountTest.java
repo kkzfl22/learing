@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.sex.order067.removeassignmentstoParameters.referactoring;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * 进行数据计算操作
@@ -15,6 +16,6 @@ public class DataCountTest {
   public void testDiscount() {
     DataCount instance = new DataCount();
     int value = instance.discount(51, 101, 10001);
-    Assert.assertEquals(44, value);
+    assertEquals(44, value);
   }
 }

@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.seven.order074.inlineclass.referactoring;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * 进行测试
@@ -20,6 +21,6 @@ public class PersonTest {
     person.setOfficeAreaCode("86");
     person.setOfficeNumber("13451913228");
 
-    Assert.assertEquals("(86)13451913228", person.getTelephoneNumber());
+    assertEquals("(86)13451913228", person.getTelephoneNumber());
   }
 }

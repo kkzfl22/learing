@@ -1,7 +1,8 @@
 package com.liujun.legacy.code.parttwo.order206.mastupdate.wrapmethod.base;
 
 import com.liujun.legacy.code.parttwo.order206.mastupdate.wrapmethod.common.PayDispatcher;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * 没说员工

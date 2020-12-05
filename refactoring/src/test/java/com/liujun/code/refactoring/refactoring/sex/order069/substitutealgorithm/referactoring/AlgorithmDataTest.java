@@ -1,8 +1,9 @@
 package com.liujun.code.refactoring.refactoring.sex.order069.substitutealgorithm.referactoring;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.hamcrest.Matchers;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * 进行原算法的测试
@@ -17,6 +18,6 @@ public class AlgorithmDataTest {
     String[] data = new String[] {"Don"};
     AlgorithmData instance = new AlgorithmData();
     String rsp = instance.foundPerson(data);
-    Assert.assertThat(data, Matchers.arrayContaining(rsp));
+    assertThat(data, Matchers.arrayContaining(rsp));
   }
 }

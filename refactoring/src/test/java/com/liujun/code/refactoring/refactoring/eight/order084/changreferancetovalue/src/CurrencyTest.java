@@ -1,6 +1,8 @@
 package com.liujun.code.refactoring.refactoring.eight.order084.changreferancetovalue.src;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 /**
  * 货币种类的测试

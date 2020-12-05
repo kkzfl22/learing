@@ -1,6 +1,6 @@
 package com.liujun.code.refactoring.refactoring.sex.order061.extractmethod.referactoring;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * 对函数执行测试

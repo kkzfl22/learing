@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.sex.order065.introduceexplainingvariable.src;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * 数据测试
@@ -16,6 +17,6 @@ public class DataDemoTest {
     DataDemo instance = new DataDemo();
     int value = instance.dataCount();
 
-    Assert.assertEquals(1, value);
+    assertEquals(1, value);
   }
 }

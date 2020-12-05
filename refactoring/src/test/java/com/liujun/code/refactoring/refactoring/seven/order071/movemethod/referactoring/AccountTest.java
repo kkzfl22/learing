@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.seven.order071.movemethod.referactoring;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * 进行账户类的测试
@@ -18,6 +19,6 @@ public class AccountTest {
     Account account = new Account(type, 10);
     double outValue = account.overdraftCharge();
     System.out.println(outValue);
-    Assert.assertEquals(12.55, outValue, 0.1);
+    assertEquals(12.55, outValue, 0.1);
   }
 }

@@ -1,6 +1,6 @@
 package com.liujun.code.refactoring.refactoring.nine.order097.intrucenullobject.refactor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author liujun

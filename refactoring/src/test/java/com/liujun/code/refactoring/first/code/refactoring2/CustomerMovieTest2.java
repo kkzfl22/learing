@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.first.code.refactoring2;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 /**
  * 测试用户租用影片
@@ -33,14 +34,14 @@ public class CustomerMovieTest2 {
 
     // 输出信息
     String outMsg = customer.statement();
-    Assert.assertNotNull(outMsg);
+    assertNotNull(outMsg);
 
     String outEqualValue =
         "Rental Record for liujun\n"
             + "\t阿凡达\t6.5\n"
             + " Amount owed is 6.5\n"
             + " You earned 1 frequent renter points";
-    Assert.assertEquals(outEqualValue, outMsg);
+    assertEquals(outEqualValue, outMsg);
   }
 
   @Test
@@ -67,8 +68,8 @@ public class CustomerMovieTest2 {
             + " Amount owed is 12.0\n"
             + " You earned 1 frequent renter points";
 
-    Assert.assertNotNull(outMsg);
-    Assert.assertEquals(outMsg, outvalue);
+    assertNotNull(outMsg);
+    assertEquals(outMsg, outvalue);
   }
 
   @Test
@@ -95,7 +96,7 @@ public class CustomerMovieTest2 {
 
     // 输出信息
     String outMsg = customer.statement();
-    Assert.assertNotNull(outMsg);
-    Assert.assertEquals(outEqualValue, outMsg);
+    assertNotNull(outMsg);
+    assertEquals(outEqualValue, outMsg);
   }
 }

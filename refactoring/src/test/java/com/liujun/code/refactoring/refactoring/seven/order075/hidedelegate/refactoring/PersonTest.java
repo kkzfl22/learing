@@ -1,6 +1,6 @@
 package com.liujun.code.refactoring.refactoring.seven.order075.hidedelegate.refactoring;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author liujun

@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.eight.order111.encapsulatecollection.src;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,14 +24,14 @@ public class CourseTest {
     dataSet.add(new Course("c", false));
     dataSet.add(new Course("go", false));
     kent.setCourses(dataSet);
-    Assert.assertEquals(4, kent.getCourse().size());
+    assertEquals(4, kent.getCourse().size());
 
     Course refact = new Course("sql", true);
     kent.getCourse().add(refact);
     kent.getCourse().add(new Course("javascript", false));
-    Assert.assertEquals(6, kent.getCourse().size());
+    assertEquals(6, kent.getCourse().size());
 
     kent.getCourse().remove(refact);
-    Assert.assertEquals(5, kent.getCourse().size());
+    assertEquals(5, kent.getCourse().size());
   }
 }

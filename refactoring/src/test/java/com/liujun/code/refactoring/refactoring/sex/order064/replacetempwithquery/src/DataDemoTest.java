@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.sex.order064.replacetempwithquery.src;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * 单元测试
@@ -16,7 +17,7 @@ public class DataDemoTest {
     DataDemo instance = new DataDemo();
     double outValue = instance.count();
     System.out.println(outValue);
-    Assert.assertEquals(outValue, 1900.0, 0.95);
+    assertEquals(outValue, 1900.0, 0.95);
     // Assert.assertThat(outValue, Matchers);
   }
 }

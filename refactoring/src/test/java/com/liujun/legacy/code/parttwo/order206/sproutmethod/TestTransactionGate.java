@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.liujun.legacy.code.parttwo.order206.mastupdate.sproutmethod.newcode.TransactionGate;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import com.liujun.legacy.code.parttwo.order206.mastupdate.sproutmethod.common.DataOperator;
 import com.liujun.legacy.code.parttwo.order206.mastupdate.sproutmethod.common.TransactionBundle;

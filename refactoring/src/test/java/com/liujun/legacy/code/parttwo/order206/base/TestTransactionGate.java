@@ -3,7 +3,8 @@ package com.liujun.legacy.code.parttwo.order206.base;
 import com.liujun.legacy.code.parttwo.order206.mastupdate.sproutmethod.common.DataOperator;
 import com.liujun.legacy.code.parttwo.order206.mastupdate.sproutmethod.base.TransactionGate;
 import com.liujun.legacy.code.parttwo.order206.mastupdate.sproutmethod.common.TransactionBundle;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;

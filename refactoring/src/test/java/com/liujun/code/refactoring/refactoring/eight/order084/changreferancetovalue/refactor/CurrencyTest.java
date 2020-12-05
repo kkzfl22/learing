@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.eight.order084.changreferancetovalue.refactor;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
 
 /**
  * 测试货币对象
@@ -13,6 +14,6 @@ public class CurrencyTest {
 
   @Test
   public void testInstance() {
-    Assert.assertEquals(true, new Currency("USD").equals(new Currency("USD")));
+    assertEquals(true, new Currency("USD").equals(new Currency("USD")));
   }
 }

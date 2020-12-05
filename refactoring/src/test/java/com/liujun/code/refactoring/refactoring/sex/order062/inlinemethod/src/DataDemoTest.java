@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.sex.order062.inlinemethod.src;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * 内联函数的单元测试
@@ -15,6 +16,6 @@ public class DataDemoTest {
   public void testGetRating() {
     DataDemo data = new DataDemo(10);
     int value = data.getReting();
-    Assert.assertEquals(2, value);
+    assertEquals(2, value);
   }
 }

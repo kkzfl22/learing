@@ -1,7 +1,8 @@
 package com.liujun.code.refactoring.refactoring.seven.order072.movefield.referactoring;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * 测试利率的计算
@@ -19,6 +20,6 @@ public class AccountTest {
     Account instance = new Account(type);
     double value = instance.interestForAmountDays(10000, 100);
     System.out.println(value);
-    Assert.assertEquals(273.972602739726, value, 0.1);
+    assertEquals(273.972602739726, value, 0.1);
   }
 }
