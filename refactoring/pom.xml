@@ -18,6 +18,19 @@
 
     <dependencyManagement>
         <dependencies>
+
+
+            <!-- 如果使用Junit4.5以上 jmockit依赖需要在junit4之前 -->
+            <!-- 或者在测试类上添加注解 @RunWith(JMockit.class) -->
+            <!-- 如果是TestNG 6.2+ 或者 JUnit 5+， 没有位置限制 -->
+            <!--经过测试发现jmockit的功能最全，覆盖的场景最多，所以选择了jmockit-->
+            <dependency>
+                <groupId>org.jmockit</groupId>
+                <artifactId>jmockit</artifactId>
+                <version>1.36</version>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
@@ -47,10 +60,8 @@
         <dependency>
             <groupId>org.jmockit</groupId>
             <artifactId>jmockit</artifactId>
-            <version>1.36</version>
             <scope>test</scope>
         </dependency>
-
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
